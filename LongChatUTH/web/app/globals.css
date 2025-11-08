@@ -1,0 +1,93 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+/* 🩵 Nền mặc định kiểu Long Châu (chỉ áp dụng ở Home, Search, Category) */
+/* 🩵 Nền mặc định kiểu Long Châu (trang user) */
+body.longchau-bg {
+  background: linear-gradient(to bottom, #eaf3ff 0%, #f9fcff 100%);
+  background-image: url("/bg-longchau.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: top center;
+  background-attachment: fixed;
+}
+/* ☁️ Nền đơn giản cho các trang chi tiết (cart, product, checkout...) */
+.bg-plain {
+  background: #ffffff;
+}
+
+/* Hiệu ứng ánh sáng chỉ áp dụng khi có class longchau */
+.bg-longchau main::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 400px;
+  background: radial-gradient(
+    circle at top center,
+    rgba(255, 255, 255, 0.8),
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+/* 🧱 Nền trắng xám nhẹ cho trang admin hoặc employee */
+body.admin-bg {
+  background: #f5f7fa !important;
+  background-image: none !important;
+}
+/* 🧱 Loại bỏ hoàn toàn nền LongChâu khi ở trang admin */
+/* === ADMIN OVERRIDES === */
+body.admin-page {
+  background: #f3f4f6 !important;     /* tắt nền hồng, dùng nền xám nhạt */
+}
+/* Tránh giới hạn 6xl cho admin */
+body.admin-page .site-main {
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ẩn header người dùng ở admin (nếu cần) */
+body.admin-page header,
+body.admin-page .site-header {
+  display: none !important;
+}
+
+/* Đảm bảo nội dung admin chiếm full chiều rộng trình duyệt */
+.admin-shell { width: 100%; }
+
+/* Card/khối nội dung thống nhất thẩm mỹ (không bắt buộc) */
+.admin-card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-100;
+}
+/* Ngăn background Long Châu áp dụng cho admin */
+body.admin-bg.longchau-bg {
+  background: #f5f7fa !important;
+  background-image: none !important;
+}
+/* Sidebar responsive mobile */
+@media (max-width: 768px) {
+  body.sidebar-open aside {
+    transform: translateX(0);
+  }
+  aside {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+}
+/* === ADMIN LAYOUT ONLY === */
+:root { --sb-w: 16rem; }              /* mặc định sidebar rộng 64 */
+.admin-main { margin-left: var(--sb-w); background: #f5f7fa; min-height: 100vh; }
+/* Khi mobile ẩn sidebar, bạn có thể toggle body.sidebar-open nếu muốn mở rộng/thu gọn */
+@media (max-width: 1024px) {
+  body:not(.sidebar-open) .admin-main { margin-left: 5rem; } /* khớp w-20 */
+}
