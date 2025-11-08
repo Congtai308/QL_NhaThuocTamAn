@@ -1,9 +1,0 @@
-{
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/admin/dashboard/page": "app/admin/dashboard/page.js",
-  "/admin/products/page": "app/admin/products/page.js",
-  "/admin/suppliers/page": "app/admin/suppliers/page.js",
-  "/admin/employees/page": "app/admin/employees/page.js",
-  "/admin/orders/page": "app/admin/orders/page.js"
-}
