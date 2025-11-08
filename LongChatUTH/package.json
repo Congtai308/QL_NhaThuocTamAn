@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "framer-motion": "^12.23.24",
+    "next-auth": "^4.24.11",
+    "react-chartjs-2": "^5.3.0",
+    "react-hot-toast": "^2.6.0"
+  }
+}
