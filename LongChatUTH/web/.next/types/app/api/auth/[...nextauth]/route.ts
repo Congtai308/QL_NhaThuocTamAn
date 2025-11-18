@@ -1,4 +1,4 @@
-// File: C:\xampp\htdocs\LongChatUTH\web\app\api\auth\[...nextauth]\route.ts
+// File: C:\xampp\htdocs\QL_NhaThuocTamAn\LongChatUTH\web\app\api\auth\[...nextauth]\route.ts
 import * as entry from '../../../../../../app/api/auth/[...nextauth]/route.js'
 import type { NextRequest } from 'next/server.js'
 

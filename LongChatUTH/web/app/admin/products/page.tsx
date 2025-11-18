@@ -22,8 +22,8 @@ type FormState = {
 
 type Category = { id: string | number; name: string };
 
-const API = "http://localhost:9000/LongChatUTH/api/products.php";
-const CAT_API = "http://localhost:9000/LongChatUTH/api/categories.php";
+const API = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/products.php";
+const CAT_API = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/categories.php";
 
 const initialForm: FormState = {
   name: "",
@@ -138,9 +138,16 @@ export default function AdminProducts() {
     const fd = new FormData();
     fd.append("name", form.name);
     fd.append("price", String(form.price ?? ""));
-    fd.append("category", form.category || "");        // gửi TÊN danh mục (khớp backend hiện tại)
+    fd.append("category", form.category || "");
     fd.append("manufacturer", form.manufacturer || "");
-    if (form.image) fd.append("image", form.image);    // chỉ gửi nếu có file mới
+
+    if (form.image) {
+      // Có chọn ảnh mới → gửi file
+      fd.append("image", form.image);
+    } else if (editing?.image) {
+      // Không chọn ảnh mới, đang sửa sản phẩm có sẵn ảnh → gửi lại URL cũ
+      fd.append("image", editing.image);
+    }
 
     const url = editing ? `${API}?id=${editing.id}` : API;
 
@@ -161,6 +168,7 @@ export default function AdminProducts() {
       toast.error("Không thể gửi dữ liệu!");
     }
   };
+
 
   const onDelete = async (id: number) => {
     if (!confirm("Xoá sản phẩm này?")) return;

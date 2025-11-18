@@ -6,14 +6,18 @@ import Image from "next/image";
 import type { Product } from "@/lib/api";
 import { imageUrl } from "@/lib/api";
 import { useCart, money } from "@/lib/cart";
+import { useCartUi } from "@/lib/cart-ui";
 import { useCallback, useMemo } from "react";
 
 // tách giá/đơn vị nếu cần cho nút chọn mua
-function parsePrice(text?: string) {
-  if (!text) return 0;
-  const digits = (text.match(/[\d\.]+/g) || []).join("").replace(/\./g, "");
+function parsePrice(input?: string | number | null) {
+  if (input == null) return 0;
+  if (typeof input === "number") return input;
+
+  const digits = (input.match(/\d+/g) || []).join("");
   return Number(digits) || 0;
 }
+
 function parseUnit(text?: string, fallback = "Hộp") {
   if (!text) return fallback;
   const parts = text.split("/");
@@ -22,39 +26,59 @@ function parseUnit(text?: string, fallback = "Hộp") {
 
 export default function ProductCard({ p }: { p: Product }) {
   const add = useCart((s) => s.add);
+  const showPeek = useCartUi((s) => s.showPeek);
+
   const href = useMemo(
     () => `/products/${encodeURIComponent(String(p.id))}`,
     [p.id]
   );
 
-  const priceNumber = parsePrice(p.price_text);
+  // 👉 Ưu tiên dùng cột price (number) trong DB, nếu không có thì dùng price_text cũ
+  const rawPrice = (p as any).price ?? p.price_text;
+  const priceNumber = parsePrice(rawPrice);
+
   const unit = parseUnit(p.price_text, "Hộp");
+
+  // Giá hiển thị: nếu có price_text thì giữ nguyên, không thì format từ number
+  const displayPrice =
+    (p as any).price_text && (p as any).price_text.trim().length > 0
+      ? (p as any).price_text
+      : priceNumber > 0
+      ? money(priceNumber)
+      : "Liên hệ";
+
+  const imageSrc = useMemo(
+    () => imageUrl(p.image_path || (p as any).image || ""),
+    [p.image_path, (p as any).image]
+  );
 
   const handleAdd = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault(); // chỉ chặn khi bấm nút mua, không ảnh hưởng link
       e.stopPropagation();
+
       add(
         {
           id: Number(p.id),
           name: p.name,
-          price: priceNumber,
+          price: priceNumber, // 🔴 giá đúng đưa vào cart
           unit,
-          image: p.image_path ? imageUrl(p.image_path) : undefined,
+          image: imageSrc || undefined,
         },
         1
       );
+      showPeek();
     },
-    [add, p.id, p.name, p.image_path, priceNumber, unit]
+    [add, showPeek, p.id, p.name, imageSrc, priceNumber, unit]
   );
 
   return (
     <div className="rounded-2xl border bg-white p-3 flex flex-col justify-between h-full">
-      {/* Block ảnh có overlay anchor để click dễ hơn */}
+      {/* Block ảnh */}
       <div className="aspect-square bg-gray-100 relative">
-        {p.image_path ? (
+        {imageSrc ? (
           <Image
-            src={imageUrl(p.image_path)}
+            src={imageSrc}
             alt={p.name}
             fill
             className="object-contain p-3"
@@ -66,12 +90,10 @@ export default function ProductCard({ p }: { p: Product }) {
             No Image
           </div>
         )}
-        {/* anchor phủ toàn bộ khung ảnh để bảo đảm click */}
         <Link href={href} className="absolute inset-0" aria-label={p.name} />
       </div>
 
       <div className="p-3 flex-1 flex flex-col">
-        {/* Tiêu đề là link – vùng click thứ hai */}
         <Link
           href={href}
           className="text-sm font-medium line-clamp-2 group-hover:text-blue-800"
@@ -86,10 +108,8 @@ export default function ProductCard({ p }: { p: Product }) {
           {p.category}
         </div>
 
-        {/* Giá: giữ nguyên price_text để khớp DB */}
-        <div className="mt-2 font-semibold text-blue-800">
-          {p.price_text || "Liên hệ"}
-        </div>
+        {/* Giá */}
+        <div className="mt-2 font-semibold text-blue-800">{displayPrice}</div>
 
         {/* Hành động */}
         <div className="mt-3 grid grid-cols-2 gap-2">
@@ -107,13 +127,6 @@ export default function ProductCard({ p }: { p: Product }) {
             Chọn mua
           </button>
         </div>
-
-        {/* Gợi ý đơn vị nhỏ (tuỳ chọn) */}
-        {/* {priceNumber > 0 && (
-          <div className="mt-2 text-[11px] text-slate-600">
-            {money(priceNumber)} / {unit}
-          </div>
-        )} */}
       </div>
     </div>
   );

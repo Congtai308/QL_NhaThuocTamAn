@@ -16,7 +16,7 @@ $servername = "127.0.0.1";
 $username = "root";
 $password = "";
 $dbname = "nhathuoctaman";
-$port = "3306";
+$port = "4306";
 
 // Ẩn toàn bộ warning PHP (tránh phá JSON)
 error_reporting(0);

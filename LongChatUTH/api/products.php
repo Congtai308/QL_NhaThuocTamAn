@@ -4,14 +4,14 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Content-Type: application/json; charset=UTF-8");
 
-// ✅ Cho phép preflight CORS (giải quyết lỗi fetch)
+// Preflight CORS
 if ($_SERVER["REQUEST_METHOD"] == "OPTIONS") {
   http_response_code(200);
   exit;
 }
 
 $method = $_SERVER["REQUEST_METHOD"];
-$db = new mysqli("127.0.0.1", "root", "", "nhathuoctaman", 3306);
+$db = new mysqli("127.0.0.1", "root", "", "nhathuoctaman", 4306);
 if ($db->connect_error) {
   http_response_code(500);
   echo json_encode(["error" => "Kết nối DB thất bại"]);
@@ -19,19 +19,33 @@ if ($db->connect_error) {
 }
 
 switch ($method) {
+  // 🔹 LẤY DỮ LIỆU
   case "GET":
     if (isset($_GET["id"])) {
       $id = intval($_GET["id"]);
       $res = $db->query("SELECT * FROM products WHERE id=$id");
-      echo json_encode($res->fetch_assoc());
+      $row = $res ? $res->fetch_assoc() : null;
+
+      // bổ sung thumbnail từ image cho FE
+      if ($row && isset($row["image"]) && !isset($row["thumbnail"])) {
+        $row["thumbnail"] = $row["image"];
+      }
+
+      echo json_encode($row);
     } else {
       $res = $db->query("SELECT * FROM products ORDER BY id DESC");
       $rows = [];
-      while ($r = $res->fetch_assoc()) $rows[] = $r;
+      while ($r = $res->fetch_assoc()) {
+        if (isset($r["image"]) && !isset($r["thumbnail"])) {
+          $r["thumbnail"] = $r["image"];
+        }
+        $rows[] = $r;
+      }
       echo json_encode(["items" => $rows]);
     }
     break;
 
+  // 🔹 THÊM / SỬA
   case "POST":
     $id = $_GET["id"] ?? null;
     $name = $_POST["name"] ?? "";
@@ -47,8 +61,11 @@ switch ($method) {
       $filename = time() . "_" . basename($_FILES["image"]["name"]);
       $target_file = $target_dir . $filename;
       move_uploaded_file($_FILES["image"]["tmp_name"], $target_file);
-      $image_url = "http://localhost:9000/LongChatUTH/uploads/" . $filename;
+
+      // URL ảnh public (đúng với Postman bạn test)
+      $image_url = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/uploads/" . $filename;
     } else {
+      // giữ nguyên URL cũ nếu có
       $image_url = $_POST["image"] ?? "";
     }
 
@@ -65,6 +82,7 @@ switch ($method) {
     }
     break;
 
+  // 🔹 XÓA
   case "DELETE":
     $id = $_GET["id"] ?? 0;
     $id = intval($id);
@@ -72,7 +90,11 @@ switch ($method) {
       $res = $db->query("SELECT image FROM products WHERE id=$id");
       $img = $res ? ($res->fetch_assoc()["image"] ?? "") : "";
       if ($img) {
-        $localPath = str_replace("http://localhost:9000/LongChatUTH/", "../", $img);
+        $localPath = str_replace(
+          "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/",
+          "../",
+          $img
+        );
         if (file_exists($localPath)) unlink($localPath);
       }
       $stmt = $db->prepare("DELETE FROM products WHERE id=?");
@@ -90,3 +112,4 @@ switch ($method) {
     echo json_encode(["error" => "Phương thức không được hỗ trợ"]);
 }
 ?>
+

@@ -160,6 +160,46 @@
     "image_path": "images/Thuốc_Ameflu_Không_Gây_Buồn_Ngủ_OPV_điều_trị_các_triệu_chứng_cảm_lạnh_và_cảm_cúm_10_vỉ_x_10_viên.png"
   },
   {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/salonpas-6-5-cm-x-4-2-cm-hisamitsu-5-hop-le-x-4-goi-1.html",
+    "name": "Thuốc Salonpas 6.5cm x 4.2cm Hisamitsu hỗ trợ giảm đau, kháng viêm (5 hộp x 4 gói)",
+    "price": "14.500đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "14.500đ"
+      }
+    ],
+    "brand": "Hisamitsu",
+    "category": "Miếng dán và cao dán giảm đau",
+    "registration": "893100105223 Sao chép",
+    "form": "Cao dán",
+    "size_spec": "Hộp 24 Gói x 10 Miếng",
+    "manufacturer": "Hisamitsu",
+    "origin": "Việt Nam",
+    "ingredient": "Tocopherol acetate , L-menthol , DL-camphor , Methyl salicylate",
+    "image_path": "images/Thuốc_Salonpas_65cm_x_42cm_Hisamitsu_hỗ_trợ_giảm_đau_kháng_viêm_5_hộp_x_4_gói.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/curam-625-mg-sandoz-25-x4.html",
+    "name": "Thuốc Curam 625mg Sandoz điều trị nhiễm khuẩn do các vi khuẩn nhạy cảm (25 vỉ x 4 viên)",
+    "price": "000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "000đ"
+      }
+    ],
+    "brand": "Sandoz",
+    "category": "Thuốc kháng sinh",
+    "registration": "900110976524 Sao chép",
+    "form": "Viên nén bao phim",
+    "size_spec": "Hộp 25 Vỉ x 4 Viên",
+    "manufacturer": "SANDOZ GMBH",
+    "origin": "Áo",
+    "ingredient": "Amoxicillin , ACID CLAVULANIC",
+    "image_path": "images/Thuốc_Curam_625mg_Sandoz_điều_trị_nhiễm_khuẩn_do_các_vi_khuẩn_nhạy_cảm_25_vỉ_x_4_viên.png"
+  },
+  {
     "url": "https://nhathuoclongchau.com.vn/thuoc/clarityne-10-mg-bayer-1-x10.html",
     "name": "Thuốc Clarityne 10mg Bayer giảm các triệu chứng do viêm mũi dị ứng và mày đay mạn tính vô căn (1 vỉ x 10 viên)",
     "price": "6.700đ / Hộp",
@@ -198,5 +238,765 @@
     "origin": "Ấn Độ",
     "ingredient": "Lactulose",
     "image_path": "images/Thuốc_Lactulin_10g_Meyer_giúp_dự_phòng_và_điều_trị_bệnh_não_do_gan_táo_bón_mạn_tính_100ml.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/hadumedrol-100-mg-ml-hdpharma-100-ong-x-1-ml.html",
+    "name": "Thuốc Hadumedrol 10mg/ml Hdpharma giúp chống buồn nôn hoặc chóng mặt (100 ống x 1ml)",
+    "price": "730đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "730đ"
+      }
+    ],
+    "brand": "Hdpharma",
+    "category": "Thuốc tiêm chích",
+    "registration": "893110299000 Sao chép",
+    "form": "Dung dịch tiêm",
+    "size_spec": "Hộp 100 Ống x 1ml",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC VTYT HẢI DƯƠNG",
+    "origin": "Việt Nam",
+    "ingredient": "Diphenhydramin hydroclorid",
+    "image_path": "images/Thuốc_Hadumedrol_10mgml_Hdpharma_giúp_chống_buồn_nôn_hoặc_chóng_mặt_100_ống_x_1ml.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/zinnat-tablets-500-mg-sandoz-1-x10.html",
+    "name": "Thuốc Zinnat tablets 500mg Sandoz điều trị những nhiễm khuẩn do vi khuẩn nhạy cảm gây ra (1 vỉ x 10 viên)",
+    "price": "000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "000đ"
+      }
+    ],
+    "brand": "Sandoz",
+    "category": "Thuốc kháng sinh",
+    "registration": "VN-20514-17 Sao chép",
+    "form": "Viên nén bao phim",
+    "size_spec": "Hộp 1 Vỉ x 10 Viên",
+    "manufacturer": "GLAXO OPERATIONS UK., LTD",
+    "origin": "Anh",
+    "ingredient": "Cefuroxim",
+    "image_path": "images/Thuốc_Zinnat_tablets_500mg_Sandoz_điều_trị_những_nhiễm_khuẩn_do_vi_khuẩn_nhạy_cảm_gây_ra_1_vỉ_x_10_v.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/prospan-engelhard-200-ml.html",
+    "name": "Thuốc Prospan Engelhard điều trị triệu chứng trong các bệnh lý viêm phế quản mạn tính 200ml",
+    "price": "156.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "156.000đ"
+      }
+    ],
+    "brand": "Engelhard",
+    "category": "Siro trị ho cảm",
+    "registration": "400200006124 Sao chép",
+    "form": "Siro",
+    "size_spec": "Hộp x 200ml",
+    "manufacturer": "ENGELHARD ARZNEMITTEL GMBH & CO.KG",
+    "origin": "Đức",
+    "ingredient": "Chiết xuất cao khô lá thường xuân",
+    "image_path": "images/Thuốc_Prospan_Engelhard_điều_trị_triệu_chứng_trong_các_bệnh_lý_viêm_phế_quản_mạn_tính_200ml.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/liverton-care-70-mg-stada-10-x10.html",
+    "name": "Thuốc Liverton Care 70mg Stada hỗ trợ điều trị viêm gan mạn tính, có tác dụng lợi mật (10 vỉ x 10 viên)",
+    "price": "1.670đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "1.670đ"
+      }
+    ],
+    "brand": "Stada",
+    "category": "Thuốc trị bệnh gan",
+    "registration": "VD-32770-19 Sao chép",
+    "form": "Viên nén bao phim",
+    "size_spec": "Hộp 10 Vỉ x 10 Viên",
+    "manufacturer": "Chi nhánh Công ty cổ phần dược phẩm Agimexpharm– Bình Hòa",
+    "origin": "Việt Nam",
+    "ingredient": "Silymarin",
+    "image_path": "images/Thuốc_Liverton_Care_70mg_Stada_hỗ_trợ_điều_trị_viêm_gan_mạn_tính_có_tác_dụng_lợi_mật_10_vỉ_x_10_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/rhinocort-aqua-64-mcg-mcneil-120-lieu.html",
+    "name": "Thuốc Rhinocort Aqua 64mcg McNeil điều trị trong các trường hợp viêm mũi dị ứng quanh năm và viêm mũi dị ứng theo mùa (120 liều)",
+    "price": "234.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "234.000đ"
+      }
+    ],
+    "brand": "McNeil",
+    "category": "Thuốc xịt hen suyễn",
+    "registration": "730100964124 Sao chép",
+    "form": "Hỗn dịch xịt mũi",
+    "size_spec": "Hộp",
+    "manufacturer": "McNeil AB",
+    "origin": "Thụy Điển",
+    "ingredient": "Budesonide",
+    "image_path": "images/Thuốc_Rhinocort_Aqua_64mcg_McNeil_điều_trị_trong_các_trường_hợp_viêm_mũi_dị_ứng_quanh_năm_và_viêm_mũ.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/ventinos-64-mcg-dhg-10-ml.html",
+    "name": "Thuốc Ventinos 64mcg DHG điều trị và phòng ngừa các dấu hiệu và triệu chứng của viêm mũi dị ứng (10ml)",
+    "price": "72.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "72.000đ"
+      }
+    ],
+    "brand": "Dhg",
+    "category": "Thuốc xịt mũi",
+    "registration": "893100224624 Sao chép",
+    "form": "Hỗn dịch xịt mũi",
+    "size_spec": "Hộp x 10ml",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC HẬU GIANG",
+    "origin": "Việt Nam",
+    "ingredient": "Budesonide",
+    "image_path": "images/Thuốc_Ventinos_64mcg_DHG_điều_trị_và_phòng_ngừa_các_dấu_hiệu_và_triệu_chứng_của_viêm_mũi_dị_ứng_10ml.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/m-cort-cream-agio-15-g.html",
+    "name": "Thuốc M CORT cream Agio điều trị các biểu hiện viêm và ngứa của bệnh vẩy nến, viêm da dị ứng (15g)",
+    "price": "73.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "73.000đ"
+      }
+    ],
+    "brand": "Agio",
+    "category": "Thuốc bôi ngoài da",
+    "registration": "890100423423 Sao chép",
+    "form": "Kem bôi ngoài",
+    "size_spec": "Hộp x 15g",
+    "manufacturer": "AGIO PHARMACEUTICALS LTD",
+    "origin": "Ấn Độ",
+    "ingredient": "Mometasone furoate",
+    "image_path": "images/Thuốc_M_CORT_cream_Agio_điều_trị_các_biểu_hiện_viêm_và_ngứa_của_bệnh_vẩy_nến_viêm_da_dị_ứng_15g.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/nitidine-15-mg-ml-phuong-dong-10-ong.html",
+    "name": "Thuốc Nitidine 15mg/ml Phương Đông điều trị loét tá tràng (10 ống)",
+    "price": "000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "000đ"
+      }
+    ],
+    "brand": "Phương Đông",
+    "category": "Thuốc dạ dày",
+    "registration": "VD-35957-22 Sao chép",
+    "form": "Dung dịch uống",
+    "size_spec": "Hộp 10 Ống",
+    "manufacturer": "CÔNG TY DƯỢC PHẨM VÀ THƯƠNG MẠI PHƯƠNG ĐÔNG (TNHH) - VIỆT NAM",
+    "origin": "Việt Nam",
+    "ingredient": "Nizatidine",
+    "image_path": "images/Thuốc_Nitidine_15mgml_Phương_Đông_điều_trị_loét_tá_tràng_10_ống.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/salonpas-diclofenac-patch-hisamitsu-15-goi-x-2-mieng.html",
+    "name": "Cao dán Salonpas Diclofenac Patch Hisamitsu giảm đau, kháng viêm đau cơ, đau vai (15 gói x 2 miếng)",
+    "price": "45.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "45.000đ"
+      }
+    ],
+    "brand": "Hisamitsu",
+    "category": "Miếng dán giảm đau",
+    "registration": "499100185800 Sao chép",
+    "form": "Cao dán",
+    "size_spec": "Hộp 15 Gói x 2 Miếng",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC PHẨM HISAMITSU",
+    "origin": "Nhật Bản",
+    "ingredient": "Diclofenac Sodium",
+    "image_path": "images/Cao_dan_Salonpas_Diclofenac_Patch_Hisamitsu_giảm_đau_kháng_viêm_đau_cơ_đau_vai_15_gói_x_2_miếng.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/marvelon-organon-1-x21.html",
+    "name": "Thuốc tránh thai Marvelon Organon (21 viên)",
+    "price": "81.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "81.000đ"
+      }
+    ],
+    "brand": "Organon",
+    "category": "Thuốc tránh thai",
+    "registration": "870110036125 Sao chép",
+    "form": "Viên nén",
+    "size_spec": "Hộp 1 Vỉ x 21 Viên",
+    "manufacturer": "N.V. ORGANON",
+    "origin": "Hà Lan",
+    "ingredient": "Desogestrel , Ethinylestradiol",
+    "image_path": "images/Thuốc_tránh_thai_Marvelon_Organon_21_viên.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/mercilon-organon-1-x21.html",
+    "name": "Thuốc Mercilon Organon hỗ trợ tránh thai (1 vỉ x 21 viên)",
+    "price": "92.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "92.000đ"
+      }
+    ],
+    "brand": "Organon",
+    "category": "Thuốc tránh thai",
+    "registration": "870110529024 Sao chép",
+    "form": "Viên nén",
+    "size_spec": "Hộp 1 Vỉ x 21 Viên",
+    "manufacturer": "N.V. ORGANON",
+    "origin": "Hà Lan",
+    "ingredient": "Desogestrel , Ethinylestradiol",
+    "image_path": "images/Thuốc_Mercilon_Organon_hỗ_trợ_tránh_thai_1_vỉ_x_21_viên.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/bipp-zinc-powder-70-mg-dhg-24-goi-x-1-5-g.html",
+    "name": "Thuốc Bipp zinc powder 70mg DHG giúp bổ sung kẽm, tăng cường sức để kháng cho trẻ em (24 gói x 1.5g)",
+    "price": "2.200đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "2.200đ"
+      }
+    ],
+    "brand": "Dhg",
+    "category": "Thuốc bổ",
+    "registration": "893100198224 Sao chép",
+    "form": "Cốm pha hỗn dịch uống",
+    "size_spec": "Hộp 24 Gói",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC HẬU GIANG",
+    "origin": "Việt Nam",
+    "ingredient": "Kẽm Gluconat",
+    "image_path": "images/Thuốc_Bipp_zinc_powder_70mg_DHG_giúp_bổ_sung_kẽm_tăng_cường_sức_để_kháng_cho_trẻ_em_24_gói_x_15g.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/sam-nhung-bo-than-tw-3-foripharm-60-v.html",
+    "name": "Sâm nhung bổ thận TW3 Foripharm giúp tăng cường sức khỏe, cải thiện tiểu đêm, tê mỏi chân tay (60 viên)",
+    "price": "285.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "285.000đ"
+      }
+    ],
+    "brand": "Tw3",
+    "category": "Thuốc trị bệnh thận",
+    "registration": "VD-24304-16 Sao chép",
+    "form": "Viên nang cứng",
+    "size_spec": "Hộp 60 Viên",
+    "manufacturer": "TW3",
+    "origin": "Việt Nam",
+    "ingredient": "Trạch tả , Thục địa , Bạch linh , Liên Nhục , Hoài Sơn , Đương quy , Đảng Sâm , Câu kỷ tử , Bách hợp , Viễn chí , Xuyên khung , Tục đoạn , Thỏ ty tử , Hà thủ ô đỏ , Ba kích , Nhân Sâm , Cam thảo , Nhung hươu , Ban long , Đỗ trọng , Nhục thung dung , Cẩu tích , Bạch truật",
+    "image_path": "images/Sâm_nhung_bổ_thận_TW3_Foripharm_giúp_tăng_cường_sức_khỏe_cải_thiện_tiểu_đêm_tê_mỏi_chân_tay_60_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/minox-20-mg-edol-100-ml.html",
+    "name": "Thuốc Minox 20mg Edol điều trị rụng tóc kiểu androgenic và rụng tóc từng vùng (100ml)",
+    "price": "560.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "560.000đ"
+      }
+    ],
+    "brand": "EDOL",
+    "category": "Thuốc bôi ngoài da",
+    "registration": "560100959924 Sao chép",
+    "form": "Dung dịch",
+    "size_spec": "Hộp x 100ml",
+    "manufacturer": "Laboratorio Edol Produtos Farmaceuticos S.A.",
+    "origin": "Bồ Đào Nha",
+    "ingredient": "Minoxidil",
+    "image_path": "images/Thuốc_Minox_20mg_Edol_điều_trị_rụng_tóc_kiểu_androgenic_và_rụng_tóc_từng_vùng_100ml.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/minox-50-mg-edol-60-ml.html",
+    "name": "Thuốc Minox 50mg EDOL điều trị tại chỗ hói đầu và rụng tóc androgenic ở cả nam và nữ 60ml",
+    "price": "545.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "545.000đ"
+      }
+    ],
+    "brand": "EDOL",
+    "category": "Thuốc bôi ngoài da",
+    "registration": "560100960024 Sao chép",
+    "form": "Dung dịch",
+    "size_spec": "Hộp x 60ml",
+    "manufacturer": "Laboratorio Edol Produtos Farmaceuticos S.A.",
+    "origin": "Bồ Đào Nha",
+    "ingredient": "Minoxidil",
+    "image_path": "images/Thuốc_Minox_50mg_EDOL_điều_trị_tại_chỗ_hói_đầu_và_rụng_tóc_androgenic_ở_cả_nam_và_nữ_60ml.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/decolgen-forte-united-30-x4.html",
+    "name": "Thuốc Decolgen Forte United giảm các triệu chứng cảm cúm, sốt, đau họng, nghẹt mũi (30 vỉ x 4 viên)",
+    "price": "1.250đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "1.250đ"
+      }
+    ],
+    "brand": "United",
+    "category": "Thuốc giảm đau hạ sốt",
+    "registration": "893100340723 Sao chép",
+    "form": "Viên nén",
+    "size_spec": "Hộp 30 Vỉ x 4 Viên",
+    "manufacturer": "CÔNG TY TNHH UNITED INTERNATIONAL PHARMA",
+    "origin": "Việt Nam",
+    "ingredient": "Paracetamol , Phenylephrine , Chlorpheniramine",
+    "image_path": "images/Thuốc_Decolgen_Forte_United_giảm_các_triệu_chứng_cảm_cúm_sốt_đau_họng_nghẹt_mũi_30_vỉ_x_4_viên.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/decolgen-nd-500-mg-united-30-x4.html",
+    "name": "Thuốc Decolgen ND 500mg United giảm các triệu chứng cảm lạnh, cúm, sốt, đau họng, nghẹt mũi (30 vỉ x 4 viên)",
+    "price": "1.250đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "1.250đ"
+      }
+    ],
+    "brand": "United",
+    "category": "Thuốc giảm đau hạ sốt",
+    "registration": "VD-22382-15 Sao chép",
+    "form": "Viên nén",
+    "size_spec": "Hộp 30 Vỉ x 4 Viên",
+    "manufacturer": "CÔNG TY TNHH UNITED INTERNATIONAL PHARMA",
+    "origin": "Việt Nam",
+    "ingredient": "Paracetamol , Phenylephrine",
+    "image_path": "images/Thuốc_Decolgen_ND_500mg_United_giảm_các_triệu_chứng_cảm_lạnh_cúm_sốt_đau_họng_nghẹt_mũi_30_vỉ_x_4_vi.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/mazzgin-dhg-pharma-10-x10.html",
+    "name": "Thuốc Mazzgin DHG Pharma điều trị các trường hợp thiếu magnesi riêng biệt hay kết hợp (10 vỉ x 10 viên)",
+    "price": "504đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "504đ"
+      }
+    ],
+    "brand": "Dhg",
+    "category": "Thuốc bổ",
+    "registration": "893100051524 Sao chép",
+    "form": "Viên nén bao phim",
+    "size_spec": "Hộp 10 Vỉ x 10 Viên",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC HẬU GIANG",
+    "origin": "Việt Nam",
+    "ingredient": "Magnesi lactat dihydrat , Vitamin B6",
+    "image_path": "images/Thuốc_Mazzgin_DHG_Pharma_điều_trị_các_trường_hợp_thiếu_magnesi_riêng_biệt_hay_kết_hợp_10_vỉ_x_10_viê.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/amino-xl-cmps-3-x10.html",
+    "name": "Thuốc Amino XL CMPS hỗ trợ ngăn ngừa thiếu hụt protein, duy trì và cải thiện sức khỏe (3 vỉ x 10 viên)",
+    "price": "22.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "22.000đ"
+      }
+    ],
+    "brand": "CMPS",
+    "category": "Thuốc bổ",
+    "registration": "930100136023 Sao chép",
+    "form": "Viên nén bao phim",
+    "size_spec": "Hộp 3 Vỉ x 10 Viên",
+    "manufacturer": "CONTRACT MANUFACTURING & PACKAGING SERVICES PTY LTD",
+    "origin": "Úc",
+    "ingredient": "Alanine , Serine , Glycin , Threonine , Phenylalanine , Glutamine , Leucin , Valine , Lysin hydrochlorid , Acid aspartic , Tyrosine , Isoleucine , Cystein hydroclorid , Histidin hydrochlorid , Prolin",
+    "image_path": "images/Thuốc_Amino_XL_CMPS_hỗ_trợ_ngăn_ngừa_thiếu_hụt_protein_duy_trì_và_cải_thiện_sức_khỏe_3_vỉ_x_10_viên.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/boncinco-ha-nam-20-ong-x-7-5-ml.html",
+    "name": "Thuốc Boncinco Hà Nam giúp bổ sung các vitamin và acid amin thiết yếu (20 ống x 7.5ml)",
+    "price": "14.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "14.000đ"
+      }
+    ],
+    "brand": "Hà Nam",
+    "category": "Thuốc bổ",
+    "registration": "VD-34589-20 Sao chép",
+    "form": "Siro",
+    "size_spec": "Hộp 20 Ống x 7.5ml",
+    "manufacturer": "CÔNG TY CP DƯỢC VẬT TƯ Y TẾ HÀ NAM",
+    "origin": "Việt Nam",
+    "ingredient": "Lysin hydrochlorid , Thiamin hydroclorid , Riboflavin sodium phosphate , Pyridoxin hydroclorid , Cholecalciferol , DL-alpha tocopheryl acetate , Niacinamide , Dexpanthenol , Calci",
+    "image_path": "images/Thuốc_Boncinco_Hà_Nam_giúp_bổ_sung_các_vitamin_và_acid_amin_thiết_yếu_20_ống_x_75ml.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/fluimucil-600-mg-zambon-5-x2.html",
+    "name": "Thuốc Fluimucil 600mg Zambon điều trị bệnh hô hấp kèm tăng tiết đờm nhày (5 vỉ x 2 viên)",
+    "price": "15.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "15.000đ"
+      }
+    ],
+    "brand": "Zambon",
+    "category": "Thuốc trị ho cảm",
+    "registration": "VN-23097-22 Sao chép",
+    "form": "Viên nén sủi bọt",
+    "size_spec": "Hộp 5 Vỉ x 2 Viên",
+    "manufacturer": "Zambon Switzerland Ltd",
+    "origin": "Thụy Sĩ",
+    "ingredient": "Acetylcysteine",
+    "image_path": "images/Thuốc_Fluimucil_600mg_Zambon_điều_trị_bệnh_hô_hấp_kèm_tăng_tiết_đờm_nhày_5_vỉ_x_2_viên.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/ronakym-100-mg-drp-inter-3-x10.html",
+    "name": "Thuốc Ronakym 100mg DRP Inter điều trị đái tháo đường tuýp 2 ở người lớn (3 vỉ x 10 viên)",
+    "price": "000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "000đ"
+      }
+    ],
+    "brand": "DRP",
+    "category": "Thuốc trị tiểu đường",
+    "registration": "893110464823 Sao chép",
+    "form": "Viên nén bao phim",
+    "size_spec": "Hộp 3 Vỉ x 10 Viên",
+    "manufacturer": "Công ty TNHH DRP Inter",
+    "origin": "Việt Nam",
+    "ingredient": "Canagliflozin",
+    "image_path": "images/Thuốc_Ronakym_100mg_DRP_Inter_điều_trị_đái_tháo_đường_tuýp_2_ở_người_lớn_3_vỉ_x_10_viên.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/dai-trang-nang-ba-giang-5-x10.html",
+    "name": "Thuốc Đại tràng nang Bà Giằng điều trị viêm đại tràng co thắt, hội chứng ruột kích thích (5 vỉ x 10 viên)",
+    "price": "1.800đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "1.800đ"
+      }
+    ],
+    "brand": "Bà Giằng",
+    "category": "Thuốc tiêu hoá",
+    "registration": "TCT-00219-24 Sao chép",
+    "form": "Viên nang cứng",
+    "size_spec": "Hộp 5 Vỉ x 10 Viên",
+    "manufacturer": "BÀ GIẰNG",
+    "origin": "Việt Nam",
+    "ingredient": "Bạch truật , Mộc hương , Hoàng liên , Cam thảo , Bạch linh , Đảng Sâm , Thần Khúc , Trần bì , Sa nhân , Mạch Nha , Sơn Tra , Hoài Sơn , Nhục đậu khấu",
+    "image_path": "images/Thuốc_Đại_tràng_nang_Bà_Giằng_điều_trị_viêm_đại_tràng_co_thắt_hội_chứng_ruột_kích_thích_5_vỉ_x_10_vi.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/enalapril-10-mg-stella-10-x10.html",
+    "name": "Thuốc Enalapril 10mg Stella điều trị tăng huyết áp, suy tim sung huyết (10 vỉ x 10 viên)",
+    "price": "000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "000đ"
+      }
+    ],
+    "brand": "Stella Pharm",
+    "category": "Thuốc tim mạch huyết áp",
+    "registration": "893110049423 Sao chép",
+    "form": "Viên nén",
+    "size_spec": "Hộp 10 Vỉ x 10 Viên",
+    "manufacturer": "Công ty TNHH Liên Doanh Stellapharm - Chi nhánh 1",
+    "origin": "Việt Nam",
+    "ingredient": "Enalapril",
+    "image_path": "images/Thuốc_Enalapril_10mg_Stella_điều_trị_tăng_huyết_áp_suy_tim_sung_huyết_10_vỉ_x_10_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/otrera-0-1-an-thien-10-ml.html",
+    "name": "Dung dịch xịt mũi Otrera 0,1% An Thiên giảm nghẹt mũi và sung huyết mũi (10ml)",
+    "price": "25.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "25.000đ"
+      }
+    ],
+    "brand": "An Thiên",
+    "category": "Thuốc tai mũi họng",
+    "registration": "893100353923 Sao chép",
+    "form": "Dung dịch xịt mũi",
+    "size_spec": "Hộp",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC PHẨM AN THIÊN",
+    "origin": "Việt Nam",
+    "ingredient": "Xylometazoline hydrochloride",
+    "image_path": "images/Dung_dịch_xịt_mũi_Otrera_01_An_Thiên_giảm_nghẹt_mũi_và_sung_huyết_mũi_10ml.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/algostase-500-mg-50-mg-smb-16-v.html",
+    "name": "Thuốc Algostase 500mg/50mg SMB điều trị đau nhẹ đến vừa và hạ sốt (16 viên)",
+    "price": "4.950đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "4.950đ"
+      }
+    ],
+    "brand": "SMB Technology S.A",
+    "category": "Thuốc giảm đau hạ sốt",
+    "registration": "540100144023 Sao chép",
+    "form": "Viên nén sủi bọt",
+    "size_spec": "Hộp 16 Viên",
+    "manufacturer": "SMB TECHNOLOGY S.A",
+    "origin": "Bỉ",
+    "ingredient": "Paracetamol , Caffeine",
+    "image_path": "images/Thuốc_Algostase_500mg50mg_SMB_điều_trị_đau_nhẹ_đến_vừa_và_hạ_sốt_16_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/terpin-codein-hd-hdpharma-5-x10.html",
+    "name": "Thuốc Terpin-codein HD Hdpharma điều trị triệu chứng ho khan hoặc kích ứng (5 vỉ x 10 viên)",
+    "price": "52.500đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "52.500đ"
+      }
+    ],
+    "brand": "Hdpharma",
+    "category": "Thuốc trị ho cảm",
+    "registration": "893101855424 Sao chép",
+    "form": "Viên nang mềm",
+    "size_spec": "Hộp 5 Vỉ x 10 Viên",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC VẬT TƯ Y TẾ HẢI DƯƠNG",
+    "origin": "Việt Nam",
+    "ingredient": "Codein Phosphat , Terpin hydrate",
+    "image_path": "images/Thuốc_Terpin-codein_HD_Hdpharma_điều_trị_triệu_chứng_ho_khan_hoặc_kích_ứng_5_vỉ_x_10_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/zopistad-7-5-mg-stella-10-x10.html",
+    "name": "Thuốc Zopistad 7.5mg Stella Pharm điều trị ngắn hạn chứng mất ngủ (10 vỉ x 10 viên)",
+    "price": "000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "000đ"
+      }
+    ],
+    "brand": "Stella Pharm",
+    "category": "Thuốc thần kinh",
+    "registration": "VD-18856-13 Sao chép",
+    "form": "Viên nén bao phim",
+    "size_spec": "Hộp 10 Vỉ x 10 Viên",
+    "manufacturer": "Công ty TNHH Liên Doanh Stellapharm - Chi nhánh 1",
+    "origin": "Việt Nam",
+    "ingredient": "Zopiclone",
+    "image_path": "images/Thuốc_Zopistad_75mg_Stella_Pharm_điều_trị_ngắn_hạn_chứng_mất_ngủ_10_vỉ_x_10_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/loperamid-2-mg-stella-10-x10.html",
+    "name": "Thuốc Loperamide 2mg Stella Pharm điều trị tiêu chảy do bệnh viêm ruột (10 vỉ x 10 viên)",
+    "price": "550đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "550đ"
+      }
+    ],
+    "brand": "Stella Pharm",
+    "category": "Thuốc trị tiêu chảy",
+    "registration": "893100337723 Sao chép",
+    "form": "Viên nang cứng",
+    "size_spec": "Hộp 10 Vỉ x 10 Viên",
+    "manufacturer": "Công ty TNHH Liên Doanh Stellapharm - Chi nhánh 1",
+    "origin": "Việt Nam",
+    "ingredient": "Loperamid hydroclorid",
+    "image_path": "images/Thuốc_Loperamide_2mg_Stella_Pharm_điều_trị_tiêu_chảy_do_bệnh_viêm_ruột_10_vỉ_x_10_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/an-vi-vinaplant-tp-pharm-30-goi.html",
+    "name": "Thuốc An Vị Vinaplant TP Pharm điều trị viêm loét dạ dày - tá tràng (30 gói x 2g)",
+    "price": "4.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "4.000đ"
+      }
+    ],
+    "brand": "TP Pharm",
+    "category": "Thuốc dạ dày",
+    "registration": "TCT-00013-20 Sao chép",
+    "form": "Thuốc cốm",
+    "size_spec": "Hộp 30 Gói",
+    "manufacturer": "CÔNG TY CP DƯỢC PHẨM THÀNH PHÁT",
+    "origin": "Việt Nam",
+    "ingredient": "Bạch cập , Mai mực , Bối mẫu , Cam thảo , Diên hồ sách , Đại hoàng",
+    "image_path": "images/Thuốc_An_Vị_Vinaplant_TP_Pharm_điều_trị_viêm_loét_dạ_dày_-_tá_tràng_30_gói_x_2g.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/duphalac-abbott-20-goi-x-15-ml-goi-dai-mau-moi.html",
+    "name": "Thuốc Duphalac Abbott điều trị táo bón, điều hòa nhu động sinh lý của đại tràng (20 gói x 15ml)",
+    "price": "7.500đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "7.500đ"
+      }
+    ],
+    "brand": "Abbott",
+    "category": "Thuốc trị táo bón",
+    "registration": "870100067323 Sao chép",
+    "form": "Dung dịch uống",
+    "size_spec": "Hộp 20 Gói",
+    "manufacturer": "ABBOTT BIOLOGICALS B.V",
+    "origin": "Hà Lan",
+    "ingredient": "Lactulose",
+    "image_path": "images/Thuốc_Duphalac_Abbott_điều_trị_táo_bón_điều_hòa_nhu_động_sinh_lý_của_đại_tràng_20_gói_x_15ml.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/terpincold-hataphar-2-x15.html",
+    "name": "Thuốc Terpincold Hataphar giúp giảm triệu chứng ho, long đờm (2 vỉ x 15 viên)",
+    "price": "000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "000đ"
+      }
+    ],
+    "brand": "Hà Tây",
+    "category": "Thuốc trị ho cảm",
+    "registration": "893111215600 Sao chép",
+    "form": "Viên nén bao phim",
+    "size_spec": "Hộp 2 Vỉ x 15 Viên",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC PHẨM HÀ TÂY",
+    "origin": "Việt Nam",
+    "ingredient": "Terpin hydrate , Codein",
+    "image_path": "images/Thuốc_Terpincold_Hataphar_giúp_giảm_triệu_chứng_ho_long_đờm_2_vỉ_x_15_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/avalo-day-0-03-mg-hoa-duoc-1-x28.html",
+    "name": "Thuốc tránh thai hằng ngày Avalo Day 0,03mg Hóa Dược (1 vỉ x 28 viên)",
+    "price": "25.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "25.000đ"
+      }
+    ],
+    "brand": "Hóa Dược",
+    "category": "Thuốc tránh thai",
+    "registration": "893100169823 Sao chép",
+    "form": "Viên nén",
+    "size_spec": "Hộp 1 Vỉ x 28 Viên",
+    "manufacturer": "CÔNG TY CP HÓA DƯỢC VIỆT NAM",
+    "origin": "Việt Nam",
+    "ingredient": "Levonorgestrel",
+    "image_path": "images/Thuốc_tránh_thai_hằng_ngày_Avalo_Day_003mg_Hóa_Dược_1_vỉ_x_28_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/uro-vaxom-om-pharma-3-x10.html",
+    "name": "Thuốc Uro-Vaxom OM Pharma tăng cường miễn dịch do nhiễm khuẩn đường tiết niệu (3 vỉ x 10 viên)",
+    "price": "489.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "489.000đ"
+      }
+    ],
+    "brand": "OM Pharma",
+    "category": "Thuốc tiết niệu - sinh dục",
+    "registration": "760410251623 Sao chép",
+    "form": "Viên nang cứng",
+    "size_spec": "Hộp 3 Vỉ x 10 Viên",
+    "manufacturer": "OM PHARMA",
+    "origin": "Thụy Sĩ",
+    "ingredient": "Chất ly giải vi khuẩn đông khô Escherichia coli",
+    "image_path": "images/Thuốc_Uro-Vaxom_OM_Pharma_tăng_cường_miễn_dịch_do_nhiễm_khuẩn_đường_tiết_niệu_3_vỉ_x_10_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/zocger-0-075-medipharco-45-g.html",
+    "name": "Thuốc Zocger 0.075% Medipharco bôi ngoài da giúp giảm đau tại chỗ (45g)",
+    "price": "205.000đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "205.000đ"
+      }
+    ],
+    "brand": "Medipharco",
+    "category": "Thuốc bôi ngoài da",
+    "registration": "893110205325 Sao chép",
+    "form": "Kem bôi da",
+    "size_spec": "Hộp x 45g",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC MEDIPHARCO",
+    "origin": "Việt Nam",
+    "ingredient": "Capsaicin",
+    "image_path": "images/Thuốc_Zocger_0075_Medipharco_bôi_ngoài_da_giúp_giảm_đau_tại_chỗ_45g.png"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/fexofenadine-hydrochloride-180-mg-an-thien-3-x10.html",
+    "name": "Thuốc Fexofenadine Hydrochloride 180mg An Thiên điều trị viêm mũi dị ứng theo mùa (3 vỉ x 10 viên)",
+    "price": "2.500đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "2.500đ"
+      }
+    ],
+    "brand": "An Thiên",
+    "category": "Thuốc chống dị ứng",
+    "registration": "893100732224 Sao chép",
+    "form": "Viên nén bao phim",
+    "size_spec": "Hộp 3 Vỉ x 10 Viên",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC PHẨM AN THIÊN",
+    "origin": "Việt Nam",
+    "ingredient": "Fexofenadin Hydroclorid",
+    "image_path": "images/Thuốc_Fexofenadine_Hydrochloride_180mg_An_Thiên_điều_trị_viêm_mũi_dị_ứng_theo_mùa_3_vỉ_x_10_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/imodium-2-mg-janssen-10-x10.html",
+    "name": "Thuốc Imodium 2mg Janssen điều trị tiêu chảy cấp tính (10 vỉ x 10 viên)",
+    "price": "2.800đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "2.800đ"
+      }
+    ],
+    "brand": "Janssen",
+    "category": "Thuốc trị tiêu chảy",
+    "registration": "560100184823 Sao chép",
+    "form": "Viên nang cứng",
+    "size_spec": "Hộp 10 Vỉ x 10 Viên",
+    "manufacturer": "Lusomedicamenta Sociedade Técnica Farmacêutica, S.A.",
+    "origin": "Bồ Đào Nha",
+    "ingredient": "Loperamid hydroclorid",
+    "image_path": "images/Thuốc_Imodium_2mg_Janssen_điều_trị_tiêu_chảy_cấp_tính_10_vỉ_x_10_viên.jpg"
+  },
+  {
+    "url": "https://nhathuoclongchau.com.vn/thuoc/aliricin-khong-duong-reliv-2-x10.html",
+    "name": "Thuốc Aricicin Reliv điều trị viêm họng, viêm amidan, viêm miệng, viêm hầu (2 vỉ x 10 viên)",
+    "price": "1.550đ / Hộp",
+    "units": [
+      {
+        "unit": "Hộp",
+        "price": "1.550đ"
+      }
+    ],
+    "brand": "Reliv",
+    "category": "Viên ngậm trị ho, viêm họng",
+    "registration": "893100386523 Sao chép",
+    "form": "Viên nén ngậm",
+    "size_spec": "Hộp 2 Vỉ x 10 Viên",
+    "manufacturer": "CÔNG TY CỔ PHẦN DƯỢC PHẨM RELIV",
+    "origin": "Việt Nam",
+    "ingredient": "Tyrothricin , Benzalkonium clorid , Benzocaine",
+    "image_path": "images/Thuốc_Aricicin_Reliv_điều_trị_viêm_họng_viêm_amidan_viêm_miệng_viêm_hầu_2_vỉ_x_10_viên.jpg"
   }
 ]

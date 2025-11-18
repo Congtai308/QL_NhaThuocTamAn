@@ -28,7 +28,7 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 export default function DashboardPage() {
   // ✅ Lấy danh sách sản phẩm từ PHP API
   const { data, error } = useSWR(
-    "http://localhost:9000/LongChatUTH/api/products.php",
+    "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/products.php",
     fetcher
   );
 

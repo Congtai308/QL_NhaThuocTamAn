@@ -24,7 +24,7 @@ type OrderItem = {
   unit_price: number;
 };
 
-const API = "http://localhost:9000/LongChatUTH/api/orders.php";
+const API = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
 const STATUSES = ["Pending", "Paid", "Processing", "Shipped", "Completed", "Cancelled"];
 
 export default function OrdersPage() {

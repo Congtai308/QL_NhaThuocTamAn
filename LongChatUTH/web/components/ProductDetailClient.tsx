@@ -7,8 +7,8 @@ type Props = {
   productId: number;
   productName: string;
   productImage?: string;
-  units: Unit[]; // mảng đơn vị từ API (có thể rỗng)
-  basePriceText?: string; // fallback nếu không có units
+  units: Unit[];
+  basePriceText?: string;
 };
 
 export default function ProductDetailClient({
@@ -25,23 +25,29 @@ export default function ProductDetailClient({
   const hasUnits = units && units.length > 0;
 
   const selected = useMemo(() => {
-    if (hasUnits) return units[Math.max(0, Math.min(idx, units.length - 1))];
+    if (hasUnits) {
+      return units[Math.max(0, Math.min(idx, units.length - 1))];
+    }
+
     // fallback: lấy giá từ basePriceText (vd: "45.000đ / Hộp")
-    const match = basePriceText?.match(/([\d\.]+)đ/);
-    const price =
-      Number((selected?.price_value || "").replace(/[^\d]/g, "")) || 0;
-    return { unit_name: "ĐVT", price_value: price };
+    const match = basePriceText?.match(/([\d\.]+)/);
+    const price = match ? Number(match[1].replace(/\./g, "")) : 0;
+    const unitMatch = basePriceText?.split("/")?.[1]?.trim();
+
+    return { unit_name: unitMatch || "ĐVT", price_value: price };
   }, [idx, units, hasUnits, basePriceText]);
 
   const price = selected?.price_value || 0;
-
+  const hasNumericPrice = price > 0;
+  const unitLabel = selected?.unit_name || "ĐVT";
+  const fallbackPriceLabel = basePriceText || "Liên hệ";
   function addToCart() {
     add(
       {
         id: productId,
         name: productName,
-        price: price,
-        unit: selected?.unit_name || "ĐVT",
+        price,
+        unit: unitLabel,
         image: productImage,
       },
       qty
@@ -52,10 +58,18 @@ export default function ProductDetailClient({
     <div className="bg-white/95">
       {/* Giá */}
       <div className="text-3xl font-bold text-blue-700">
-        {money(price)}{" "}
-        <span className="text-sm text-slate-500 font-normal">
-          / {selected?.unit_name || "ĐVT"}
-        </span>
+      {hasNumericPrice ? (
+          <>
+            {money(price)}{" "}
+            <span className="text-sm text-slate-500 font-normal">
+              / {unitLabel}
+            </span>
+          </>
+        ) : (
+          <span className="text-2xl font-semibold text-slate-700">
+            {fallbackPriceLabel}
+          </span>
+        )}
       </div>
 
       {/* Chọn số lượng */}

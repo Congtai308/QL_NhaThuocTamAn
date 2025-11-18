@@ -60,7 +60,7 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
 
         // 🔹 Gọi API PHP để đăng ký
         const res = await fetch(
-          "http://localhost:9000/LongChatUTH/api/register.php",
+          "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/register.php",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

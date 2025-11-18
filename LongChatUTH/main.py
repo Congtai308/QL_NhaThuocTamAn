@@ -9,7 +9,7 @@ def main():
     ]
 
     all_products = []
-    max_valid = 10  # chỉ lấy 20 sản phẩm hợp lệ
+    max_valid = 50  # chỉ lấy 20 sản phẩm hợp lệ
     total_checked = 0
     total_skipped = 0
 

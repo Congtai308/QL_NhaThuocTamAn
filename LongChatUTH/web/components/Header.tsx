@@ -1,12 +1,42 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useEffect, useMemo } from "react";
+
 import SearchBar from "./SearchBar";
-import { useCart } from "@/lib/cart";
 import AuthButtons from "@/components/nav/AuthButtons";
+import { useCart, money } from "@/lib/cart";
+import { useCartUi } from "@/lib/cart-ui";
 
 export default function Header() {
-  const count = useCart((s) => s.count()); // số sp trong giỏ
+  // Đọc dữ liệu cart
+  const count = useCart((s) => s.count());
+  const items = useCart((s) => s.items);
+
+  // Đọc UI state từng field riêng để tránh tạo object mới mỗi render
+  const peekVisible = useCartUi((s) => s.peekVisible);
+  const peek = useCartUi((s) => s.peek);
+
+  // ❗ không đưa hidePeek vào deps, dùng getState() trong setTimeout
+  useEffect(() => {
+    if (!peekVisible) return;
+
+    const t = setTimeout(() => {
+      // Luôn lấy hàm mới nhất từ store, tránh lệ thuộc vào reference trong deps
+      useCartUi.getState().hidePeek();
+    }, 4000);
+
+    return () => clearTimeout(t);
+  }, [peekVisible]);
+
+  const peekItem = useMemo(() => {
+    if (!peek) return null;
+    const actual = items.find((i) => i.id === peek.id);
+    return {
+      ...peek,
+      qty: actual?.qty || peek.qty || 1,
+    };
+  }, [items, peek]);
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-40">
@@ -39,17 +69,68 @@ export default function Header() {
         </div>
 
         {/* Cart */}
-        <Link
-          href="/cart"
-          className="relative ml-2 rounded-lg border px-3 py-2 hover:bg-slate-50"
-        >
-          🧺
-          {count > 0 && (
-            <span className="absolute -top-2 -right-2 text-[11px] bg-blue-700 text-white rounded-full px-1.5 py-0.5">
-              {count}
+        <div className="relative ml-2">
+          <Link
+            href="/cart"
+            className="relative rounded-lg border px-3 py-2 hover:bg-slate-50 flex items-center gap-2"
+          >
+            <span role="img" aria-label="cart">
+              🧺
             </span>
+            <span className="hidden sm:inline text-sm">Giỏ hàng</span>
+            {count > 0 && (
+              <span className="absolute -top-2 -right-2 text-[11px] bg-blue-700 text-white rounded-full px-1.5 py-0.5">
+                {count}
+              </span>
+            )}
+          </Link>
+
+          {peekVisible && peekItem && (
+            <div className="absolute right-0 mt-3 w-[320px] rounded-2xl border bg-white shadow-2xl p-4 transition duration-200">
+              <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">
+                Đã thêm vào giỏ hàng
+              </div>
+              <div className="flex gap-3">
+                <div className="w-14 h-14 rounded-xl bg-slate-50 border flex items-center justify-center overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={peekItem.image || "/placeholder.png"}
+                    alt={peekItem.name}
+                    className="w-full h-full object-contain p-2"
+                  />
+                </div>
+                <div className="flex-1 text-sm">
+                  <div className="font-medium leading-snug line-clamp-2">
+                    {peekItem.name}
+                  </div>
+                  <div className="text-xs text-slate-500 mt-1">
+                    {peekItem.qty} {peekItem.unit || "Sản phẩm"}
+                  </div>
+                  <div className="text-base font-semibold text-blue-800 mt-1">
+                    {peekItem.price
+                      ? money(peekItem.price)
+                      : peekItem.priceText || "Liên hệ"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full inline-block bg-emerald-500" />
+                  Có {count} sản phẩm trong giỏ
+                </span>
+              </div>
+              <div className="mt-3">
+                <Link
+                  href="/cart"
+                  className="w-full inline-flex items-center justify-center rounded-xl bg-[#0a56c5] text-white py-2 text-sm font-medium hover:bg-blue-800"
+                >
+                  Xem giỏ hàng
+                </Link>
+              </div>
+            </div>
           )}
-        </Link>
+        </div>
       </div>
     </header>
   );

@@ -1,4 +1,5 @@
 ﻿// app/page.tsx
+
 import { fetchProducts } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
 
@@ -81,7 +82,7 @@ export default async function Home() {
         {/* 6) Thương hiệu yêu thích */}
         <Brands />
 
-        {/* 7) Sản phẩm nổi bật (danh sách lưới) */}
+        {/* 7) Sản phẩm nổi bật (danh sách lưới)
         <SectionCard title="Sản phẩm nổi bật">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {items.length > 0
@@ -98,7 +99,7 @@ export default async function Home() {
                   </div>
                 ))}
           </div>
-        </SectionCard>
+        </SectionCard> */}
 
         {/* Footer mềm xanh dương */}
         <Footer />

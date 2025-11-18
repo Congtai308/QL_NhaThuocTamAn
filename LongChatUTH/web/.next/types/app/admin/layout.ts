@@ -1,4 +1,4 @@
-// File: C:\xampp\htdocs\LongChatUTH\web\app\admin\layout.tsx
+// File: C:\xampp\htdocs\QL_NhaThuocTamAn\LongChatUTH\web\app\admin\layout.tsx
 import * as entry from '../../../../app/admin/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

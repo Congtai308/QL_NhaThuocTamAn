@@ -14,7 +14,7 @@ $servername = "127.0.0.1";
 $username = "root";
 $password = "";
 $dbname = "nhathuoctaman";
-$port = "3306";
+$port = "4306";
 
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 if ($conn->connect_error) {

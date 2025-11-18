@@ -1,13 +1,22 @@
-﻿export const API_BASE =
+﻿// lib/api.ts
+export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
   "http://localhost:9000/LongChatUTH/api/index.php";
+
 export const IMAGE_BASE =
   process.env.NEXT_PUBLIC_IMAGE_BASE || "http://localhost:9000/LongChatUTH/";
 
-export function imageUrl(p?: string) {
+// Build URL ảnh tuyệt đối
+export function imageUrl(p?: string | null) {
   if (!p) return "";
+  if (/^https?:\/\//i.test(p)) return p;
   return `${IMAGE_BASE}${p.replace(/^\/+/, "")}`;
 }
+
+export type ProductUnit = {
+  unit_name: string;
+  price_value: number | string;
+};
 
 export type Product = {
   id: number;
@@ -21,9 +30,10 @@ export type Product = {
   manufacturer?: string;
   origin?: string;
   ingredient?: string;
+  image?: string | null;
   image_path?: string;
+  units?: ProductUnit[]; // 👈 thêm cho đồng bộ với product_detail.php
 };
-export type ProductUnit = { unit_name: string; price_value: string };
 
 export async function fetchProducts(page = 1, limit = 20) {
   const r = await fetch(
@@ -38,49 +48,44 @@ export async function fetchProducts(page = 1, limit = 20) {
     items: Product[];
   }>;
 }
-export async function fetchProductById(id: string | number) {
+
+export async function fetchProductById(
+  id: string | number
+): Promise<Product> {
   const r = await fetch(`${API_BASE}?path=product&id=${id}`, {
     cache: "no-store",
   });
   if (!r.ok) throw new Error("Không tìm thấy sản phẩm");
-  return r.json() as Promise<Product & { units: ProductUnit[] }>;
+  const data = (await r.json()) as Product;
+  return data;
 }
-// export async function searchProducts(q: string) {
-//   const r = await fetch(`${API_BASE}?path=search&q=${encodeURIComponent(q)}`, { cache: "no-store" });
-//   if (!r.ok) throw new Error("Lỗi tìm kiếm");
-//   return r.json() as Promise<Product[]>;
-// }
-// export async function fetchCategories() {
-//   const r = await fetch(`${API_BASE}?path=categories`, { cache: "no-store" });
-//   if (!r.ok) throw new Error("Lỗi tải danh mục");
-//   return r.json() as Promise<{ category: string; total: number }[]>;
-// }
+
+// --- Categories + search: dùng luôn API_BASE cho đẹp ---
+
 export async function fetchCategories() {
-  const res = await fetch(
-    "http://localhost:9000/LongChatUTH/api/index.php?path=categories",
-    {
-      cache: "no-store",
-    }
-  );
-  const data = await res.json();
-  // ✅ Đảm bảo luôn trả về mảng
-  return Array.isArray(data?.items)
-    ? data.items
+  const r = await fetch(`${API_BASE}?path=categories`, {
+    cache: "no-store",
+  });
+  if (!r.ok) throw new Error("Lỗi tải danh mục");
+
+  const data = await r.json();
+  return Array.isArray((data as any)?.items)
+    ? (data as any).items
     : Array.isArray(data)
     ? data
     : [];
 }
 
 export async function searchProducts(q: string) {
-  const res = await fetch(
-    `http://localhost:9000/LongChatUTH/api/index.php?path=search&q=${encodeURIComponent(
-      q
-    )}`,
+  const r = await fetch(
+    `${API_BASE}?path=search&q=${encodeURIComponent(q)}`,
     { cache: "no-store" }
   );
-  const data = await res.json();
-  return Array.isArray(data?.items)
-    ? data.items
+  if (!r.ok) throw new Error("Lỗi tìm kiếm");
+
+  const data = await r.json();
+  return Array.isArray((data as any)?.items)
+    ? (data as any).items
     : Array.isArray(data)
     ? data
     : [];

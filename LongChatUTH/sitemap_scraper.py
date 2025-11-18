@@ -11,7 +11,7 @@ def get_urls_from_sitemap(sitemap_url):
         print(f"❌ Không tải được: {sitemap_url}")
         return []
 
-    soup = BeautifulSoup(response.text, "xml")
+    soup = BeautifulSoup(response.content, "lxml-xml")
     urls = [loc.text for loc in soup.find_all("loc")]
     product_urls = [u for u in urls if u.endswith(".html")]
     print(f"🛒 {len(product_urls)} sản phẩm từ {sitemap_url}")

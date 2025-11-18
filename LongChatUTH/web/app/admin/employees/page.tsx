@@ -10,7 +10,7 @@ type Employee = {
   title: string;
 };
 
-const API = "http://localhost:9000/LongChatUTH/api/employees.php";
+const API = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/employees.php";
 
 const initialForm = { full_name: "", phone: "", email: "", title: "" };
 

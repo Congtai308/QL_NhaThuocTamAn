@@ -10,7 +10,7 @@ type Supplier = {
   email: string | null;
 };
 
-const API = "http://localhost:9000/LongChatUTH/api/suppliers.php";
+const API = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/suppliers.php";
 const initialForm = { name: "", address: "", phone: "", email: "" };
 
 export default function SuppliersPage() {
