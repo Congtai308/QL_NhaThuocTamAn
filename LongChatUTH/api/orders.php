@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . "/vnpay_config.php";
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
@@ -18,7 +20,9 @@ if ($db->connect_error) {
 }
 $db->set_charset("utf8mb4");
 
-// ------------------ TẠO ĐƠN HÀNG (CHECKOUT) ------------------
+// ===================================================
+// 1. TẠO ĐƠN HÀNG (CHECKOUT)
+// ===================================================
 if ($method === "POST" && !isset($_GET["id"])) {
   $body = json_decode(file_get_contents("php://input"), true);
 
@@ -28,13 +32,15 @@ if ($method === "POST" && !isset($_GET["id"])) {
     exit;
   }
 
-  $shipName    = trim($body["shipping_name"] ?? "");
-  $shipPhone   = trim($body["shipping_phone"] ?? "");
-  $shipAddress = trim($body["shipping_address"] ?? "");
-  $billName    = trim($body["billing_name"] ?? $shipName);
-  $billPhone   = trim($body["billing_phone"] ?? $shipPhone);
-  $billAddress = trim($body["billing_address"] ?? $shipAddress);
-  $items       = $body["items"]; // [{ id, qty }...]
+  $shipName      = trim($body["shipping_name"] ?? "");
+  $shipPhone     = trim($body["shipping_phone"] ?? "");
+  $shipAddress   = trim($body["shipping_address"] ?? "");
+  $billName      = trim($body["billing_name"] ?? $shipName);
+  $billPhone     = trim($body["billing_phone"] ?? $shipPhone);
+  $billAddress   = trim($body["billing_address"] ?? $shipAddress);
+  $items         = $body["items"]; // [{ id, qty }...]
+  $paymentMethod = $body["payment_method"] ?? "cod";  // cod | vnpay
+  $bankCodeBody  = $body["bank_code"] ?? "";          // VNPAYQR | VNBANK | INTCARD | ...
 
   if ($shipName === "" || $shipPhone === "") {
     http_response_code(400);
@@ -43,7 +49,7 @@ if ($method === "POST" && !isset($_GET["id"])) {
   }
 
   $totalAmount = 0;
-  $orderItems = [];
+  $orderItems  = [];
 
   foreach ($items as $it) {
     $pid = intval($it["id"] ?? 0);
@@ -54,19 +60,18 @@ if ($method === "POST" && !isset($_GET["id"])) {
     $stmt->bind_param("i", $pid);
     $stmt->execute();
     $res = $stmt->get_result();
-    $p = $res->fetch_assoc();
+    $p   = $res->fetch_assoc();
     $stmt->close();
 
     if (!$p) continue;
 
-    // Chuẩn hoá giá: lấy toàn bộ chữ số trong price (xử lý được cả "4.000đ", "1.469.000đ", "198000")
-$rawPrice = (string)$p["price"];
-$digits = preg_replace('/\D/', '', $rawPrice); // bỏ hết ký tự không phải số
-$unitPrice = $digits !== '' ? intval($digits) : 0;
+    // Chuẩn hoá giá: lấy toàn bộ chữ số trong price
+    $rawPrice  = (string)$p["price"];
+    $digits    = preg_replace('/\D/', '', $rawPrice);
+    $unitPrice = $digits !== '' ? intval($digits) : 0;
 
-$lineTotal = $unitPrice * $qty;
-$totalAmount += $lineTotal;
-
+    $lineTotal    = $unitPrice * $qty;
+    $totalAmount += $lineTotal;
 
     $orderItems[] = [
       "product_id" => $pid,
@@ -83,9 +88,9 @@ $totalAmount += $lineTotal;
   }
 
   // tạo mã đơn: ORD0001...
-  $codeRes = $db->query("SELECT COUNT(*) AS c FROM orders");
+  $codeRes  = $db->query("SELECT COUNT(*) AS c FROM orders");
   $countRow = $codeRes->fetch_assoc();
-  $next = intval($countRow["c"]) + 1;
+  $next     = intval($countRow["c"]) + 1;
   $orderCode = "ORD" . str_pad($next, 4, "0", STR_PAD_LEFT);
 
   $db->begin_transaction();
@@ -132,12 +137,62 @@ $totalAmount += $lineTotal;
     $stmtItem->close();
 
     $db->commit();
-    echo json_encode([
+
+    // ---------- Response mặc định ----------
+    $response = [
       "success"      => true,
       "order_id"     => $orderId,
       "order_code"   => $orderCode,
       "total_amount" => $totalAmount,
-    ]);
+    ];
+
+    // ---------- Nếu chọn thanh toán VNPAY thì tạo payment_url ----------
+    if ($paymentMethod === "vnpay") {
+
+      $vnp_TxnRef    = $orderCode;                          // mã đơn unique
+      $vnp_OrderInfo = "Thanh toán đơn hàng " . $orderCode;
+      $vnp_Amount    = $totalAmount * 100;                  // vnpay yêu cầu *100
+      $vnp_IpAddr    = $_SERVER["REMOTE_ADDR"] ?? "127.0.0.1";
+
+      $inputData = [
+        "vnp_Version"    => "2.1.0",
+        "vnp_TmnCode"    => VNP_TMN_CODE,
+        "vnp_Amount"     => $vnp_Amount,
+        "vnp_Command"    => "pay",
+        "vnp_CreateDate" => date("YmdHis"),
+        "vnp_CurrCode"   => "VND",
+        "vnp_IpAddr"     => $vnp_IpAddr,
+        "vnp_Locale"     => "vn",
+        "vnp_OrderInfo"  => $vnp_OrderInfo,
+        "vnp_OrderType"  => "other",
+        "vnp_ReturnUrl"  => VNP_RETURNURL,
+        "vnp_TxnRef"     => $vnp_TxnRef,
+      ];
+
+      // BankCode từ FE (ví dụ: VNPAYQR, VNBANK, INTCARD, v.v...)
+      if (!empty($bankCodeBody)) {
+        $inputData["vnp_BankCode"] = $bankCodeBody;
+      }
+
+      ksort($inputData);
+      $query    = "";
+      $hashData = "";
+      foreach ($inputData as $key => $value) {
+        $query    .= urlencode($key) . "=" . urlencode($value) . "&";
+        $hashData .= $key . "=" . $value . "&";
+      }
+      $query    = rtrim($query, "&");
+      $hashData = rtrim($hashData, "&");
+
+      $vnp_Url       = VNP_URL . "?" . $query;
+      $vnp_SecureHash = hash_hmac("sha512", $hashData, VNP_HASH_SECRET);
+      $vnp_Url      .= "&vnp_SecureHash=" . $vnp_SecureHash;
+
+      $response["payment_url"] = $vnp_Url;
+    }
+
+    echo json_encode($response);
+
   } catch (Exception $e) {
     $db->rollback();
     http_response_code(500);
@@ -146,11 +201,12 @@ $totalAmount += $lineTotal;
   exit;
 }
 
-// ------------------ CẬP NHẬT TRẠNG THÁI (ADMIN) ------------------
+// ===================================================
+// 2. CẬP NHẬT TRẠNG THÁI (ADMIN)
+// ===================================================
 if ($method === "POST" && isset($_GET["id"])) {
-  $id = intval($_GET["id"]);
-  $status = $_POST["status"] ?? "";
-  $status = trim($status);
+  $id     = intval($_GET["id"]);
+  $status = trim($_POST["status"] ?? "");
 
   if ($id <= 0 || $status === "") {
     http_response_code(400);
@@ -172,7 +228,9 @@ if ($method === "POST" && isset($_GET["id"])) {
   exit;
 }
 
-// ------------------ LẤY DANH SÁCH + CHI TIẾT ------------------
+// ===================================================
+// 3. LẤY DANH SÁCH + CHI TIẾT
+// ===================================================
 if ($method === "GET") {
   // Chi tiết đơn
   if (isset($_GET["id"])) {
@@ -183,7 +241,7 @@ if ($method === "GET") {
       exit;
     }
 
-    $res = $db->query("SELECT * FROM orders WHERE order_id = $id");
+    $res   = $db->query("SELECT * FROM orders WHERE order_id = $id");
     $order = $res ? $res->fetch_assoc() : null;
     if (!$order) {
       http_response_code(404);
@@ -212,7 +270,7 @@ if ($method === "GET") {
   }
 
   // Danh sách đơn
-  $where = "1=1";
+  $where  = "1=1";
   $q      = $_GET["q"] ?? "";
   $status = $_GET["status"] ?? "";
   $from   = $_GET["from"] ?? "";
@@ -227,12 +285,12 @@ if ($method === "GET") {
 
   if ($status !== "") {
     $safeStatus = $db->real_escape_string($status);
-    $where .= " AND status = '$safeStatus'";
+    $where     .= " AND status = '$safeStatus'";
   }
 
   if ($from !== "") {
     $safeFrom = $db->real_escape_string($from);
-    $where .= " AND DATE(order_date) >= '$safeFrom'";
+    $where   .= " AND DATE(order_date) >= '$safeFrom'";
   }
 
   if ($to !== "") {
@@ -240,8 +298,8 @@ if ($method === "GET") {
     $where .= " AND DATE(order_date) <= '$safeTo'";
   }
 
-  $sql = "SELECT * FROM orders WHERE $where ORDER BY order_date DESC";
-  $res = $db->query($sql);
+  $sql  = "SELECT * FROM orders WHERE $where ORDER BY order_date DESC";
+  $res  = $db->query($sql);
   $rows = [];
   while ($row = $res->fetch_assoc()) {
     $rows[] = $row;
@@ -251,7 +309,9 @@ if ($method === "GET") {
   exit;
 }
 
-// ------------------ XOÁ ĐƠN HÀNG ------------------
+// ===================================================
+// 4. XOÁ ĐƠN HÀNG
+// ===================================================
 if ($method === "DELETE") {
   parse_str($_SERVER["QUERY_STRING"] ?? "", $query);
   $id = intval($query["id"] ?? 0);
@@ -278,6 +338,8 @@ if ($method === "DELETE") {
   exit;
 }
 
-// ------------------ METHOD KHÁC ------------------
+// ===================================================
+// 5. METHOD KHÁC
+// ===================================================
 http_response_code(405);
 echo json_encode(["error" => "Method không hỗ trợ"]);

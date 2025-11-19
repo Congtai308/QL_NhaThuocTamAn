@@ -1,38 +1,49 @@
 "use client";
-import Link from "next/link";
-import { useCart, money } from "@/lib/cart";
-import { useMemo, useState, useEffect } from "react";
-/* Inline icons (không phụ thuộc lib) */
 
+import Link from "next/link";
+import { useMemo, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCart, money } from "@/lib/cart";
+
+/* Inline icons (không phụ thuộc lib) */
 const paymentOptions = [
   {
     id: "qr",
     title: "Thanh toán bằng ví điện tử / QR code",
     desc: "Hỗ trợ Momo, ZaloPay, ViettelPay...",
     icon: "💳",
+    payment_method: "vnpay",
+    bank_code: "VNPAYQR",
   },
   {
     id: "momo",
     title: "Thanh toán bằng ví MoMo",
     desc: "Quét mã hoặc đăng nhập ví",
     icon: "👜",
+    payment_method: "vnpay",
+    bank_code: "VNPAYQR",
   },
   {
     id: "cash",
     title: "Thanh toán tiền mặt khi nhận hàng",
     desc: "Miễn phí, áp dụng nội thành",
     icon: "💵",
+    payment_method: "cod", // <- đúng chính tả
+    bank_code: "",
   },
   {
     id: "atm",
     title: "Thanh toán bằng thẻ ATM / VISA",
     desc: "Hỗ trợ hầu hết ngân hàng",
     icon: "💳",
+    payment_method: "vnpay",
+    bank_code: "VNPAYQR",
   },
 ];
 
 const fieldClass =
   "w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-50 outline-none placeholder:text-slate-400";
+
 function QtyPill({
   value,
   onChange,
@@ -85,7 +96,10 @@ export default function CartPage() {
   const [districtId, setDistrictId] = useState("");
   const [wardId, setWardId] = useState("");
 
-  // 📌 Lấy danh sách TỈNH khi mở trang
+  // hook phải ở top-level
+  const searchParams = useSearchParams();
+
+  // Lấy danh sách tỉnh
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
@@ -99,11 +113,22 @@ export default function CartPage() {
         console.error("Lỗi load tỉnh:", err);
       }
     };
-
     fetchProvinces();
   }, []);
 
-  // Khi chọn TỈNH → load QUẬN/HUYỆN
+  // Xử lý redirect từ VNPAY (?pay=success|failed&code=...)
+  useEffect(() => {
+    const pay = searchParams.get("pay");
+    const code = searchParams.get("code");
+    if (pay === "success" && code) {
+      alert("Thanh toán thành công! Mã đơn: " + code);
+      clear();
+    } else if (pay === "failed" && code) {
+      alert("Thanh toán thất bại hoặc bị huỷ. Mã đơn: " + code);
+    }
+  }, [searchParams, clear]);
+
+  // Khi chọn Tỉnh -> load Huyện
   const handleProvinceChange = async (e: any) => {
     const id = e.target.value as string;
     setProvinceId(id);
@@ -126,7 +151,7 @@ export default function CartPage() {
     }
   };
 
-  // Khi chọn QUẬN/HUYỆN → load PHƯỜNG/XÃ
+  // Khi chọn Huyện -> load Xã
   const handleDistrictChange = async (e: any) => {
     const id = e.target.value as string;
     setDistrictId(id);
@@ -153,27 +178,23 @@ export default function CartPage() {
       return;
     }
 
-    // Bắt buộc nhập thông tin nếu chọn giao tận nơi
     if (method === "delivery") {
       if (!customerName.trim() || !phone.trim()) {
         alert("Vui lòng nhập Họ tên và Số điện thoại");
         return;
       }
-      // ✅ dùng đúng state: provinceId, districtId, wardId
       if (!provinceId || !districtId || !wardId || !addressDetail.trim()) {
         alert("Vui lòng nhập đầy đủ địa chỉ nhận hàng");
         return;
       }
     }
 
-    // Lấy TÊN tỉnh / quận / phường từ ID
     const provinceName =
       provinces.find((p) => p.province_id === provinceId)?.province_name || "";
     const districtName =
       districts.find((d) => d.district_id === districtId)?.district_name || "";
     const wardName = wards.find((w) => w.ward_id === wardId)?.ward_name || "";
 
-    // Ghép full địa chỉ
     const fullAddress =
       method === "delivery"
         ? `${addressDetail}, ${wardName}, ${districtName}, ${provinceName}`.replace(
@@ -181,6 +202,8 @@ export default function CartPage() {
             ""
           )
         : "Nhận tại nhà thuốc";
+
+    const selectedPayment = paymentOptions.find((opt) => opt.id === payment);
 
     const payload = {
       shipping_name: customerName || "Khách lẻ",
@@ -193,6 +216,8 @@ export default function CartPage() {
         id: i.id,
         qty: i.qty,
       })),
+      payment_method: selectedPayment?.payment_method ?? "cod",
+      bank_code: selectedPayment?.bank_code || undefined,
     };
 
     try {
@@ -211,15 +236,19 @@ export default function CartPage() {
         return;
       }
 
+      if (data.payment_url) {
+        window.location.href = data.payment_url;
+        return;
+      }
+
       alert("Đặt hàng thành công! Mã đơn: " + data.order_code);
-      clear(); // xoá giỏ hàng
+      clear();
     } catch (err) {
       console.error(err);
       alert("Có lỗi khi kết nối server");
     }
   };
 
-  // Trạng thái chọn dòng (mặc định chọn tất cả)
   const totalItems = useMemo(
     () => items.reduce((sum, i) => sum + i.qty, 0),
     [items]
@@ -356,6 +385,7 @@ export default function CartPage() {
                 />
               </div>
             </div>
+
             <div className="rounded-2xl border bg-white p-5 space-y-4">
               <div className="flex flex-wrap gap-3 items-center justify-between">
                 <div>
@@ -392,7 +422,7 @@ export default function CartPage() {
               {method === "delivery" ? (
                 <div className="space-y-3">
                   <div className="grid gap-3 md:grid-cols-2">
-                    {/* TỈNH / THÀNH PHỐ */}
+                    {/* Tỉnh / Thành phố */}
                     <select
                       className={fieldClass}
                       value={provinceId}
@@ -406,7 +436,7 @@ export default function CartPage() {
                       ))}
                     </select>
 
-                    {/* QUẬN / HUYỆN */}
+                    {/* Quận / Huyện */}
                     <select
                       className={fieldClass}
                       value={districtId}
@@ -421,7 +451,7 @@ export default function CartPage() {
                       ))}
                     </select>
 
-                    {/* PHƯỜNG / XÃ */}
+                    {/* Phường / Xã */}
                     <select
                       className={`${fieldClass} md:col-span-2`}
                       value={wardId}
@@ -451,7 +481,6 @@ export default function CartPage() {
                   />
                 </div>
               ) : (
-                // phần Nhận tại nhà thuốc giữ nguyên
                 <div className="space-y-3 text-sm text-slate-600">
                   <div className="rounded-xl border p-4">
                     <div className="font-medium">
@@ -542,6 +571,7 @@ export default function CartPage() {
                 Miễn phí vận chuyển với đơn từ 300.000đ
               </p>
             </div>
+
             <div className="rounded-2xl border bg-white p-5 space-y-3">
               <div className="text-sm font-medium text-slate-700">
                 Mã giảm giá
