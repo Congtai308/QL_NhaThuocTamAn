@@ -1,58 +1,59 @@
 "use client";
+
 import { useEffect, useMemo, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 
 type Order = {
   order_id: number;
   order_code: string;
+  order_date?: string;
+  total_amount?: number | string;
+  status?: string;
+  shipping_name?: string | null;
+  phone?: string | null;
+};
+
+type OrderForm = {
+  order_code: string;
   order_date: string;
+  total_amount: string;
   status: string;
-  total_amount: number;
-  shipping_name: string | null;
-  shipping_phone: string | null;
-  shipping_address: string | null;
-  billing_name: string | null;
-  billing_phone: string | null;
-  billing_address: string | null;
+  shipping_name: string;
+  phone: string;
 };
 
-type OrderItem = {
-  order_item_id: number;
-  product_id: number;
-  product_name: string;
-  quantity: number;
-  unit_price: number;
+const ORDER_API =
+  "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
+
+const emptyForm: OrderForm = {
+  order_code: "",
+  order_date: "",
+  total_amount: "",
+  status: "Pending",
+  shipping_name: "",
+  phone: "",
 };
 
-const API = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
-const STATUSES = ["Pending", "Paid", "Processing", "Shipped", "Completed", "Cancelled"];
-
-export default function OrdersPage() {
+export default function AdminOrders() {
   const [items, setItems] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // filters
+  // filter
   const [q, setQ] = useState("");
-  const [status, setStatus] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
-  // detail modal
-  const [detail, setDetail] = useState<{ order: Order; items: OrderItem[] } | null>(null);
-  const [upStatus, setUpStatus] = useState("");
+  // modal
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Order | null>(null);
+  const [form, setForm] = useState<OrderForm>(emptyForm);
 
-  const fetchList = async () => {
+  // fetch
+  const fetchOrders = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
-      if (q) params.append("q", q);
-      if (status) params.append("status", status);
-      if (from) params.append("from", from);
-      if (to) params.append("to", to);
-
-      const res = await fetch(`${API}?${params.toString()}`);
+      const res = await fetch(ORDER_API);
       const data = await res.json();
-      setItems(data.items || []);
+      setItems(Array.isArray(data.items) ? data.items : []);
     } catch {
       toast.error("Không tải được danh sách đơn hàng!");
     } finally {
@@ -60,123 +61,232 @@ export default function OrdersPage() {
     }
   };
 
-  const fetchDetail = async (id: number) => {
-    try {
-      const res = await fetch(`${API}?id=${id}`);
-      const data = await res.json();
-      if (data.order) {
-        setDetail(data);
-        setUpStatus(data.order.status || "");
-      } else {
-        toast.error("Không lấy được chi tiết đơn");
-      }
-    } catch {
-      toast.error("Lỗi khi tải chi tiết đơn");
-    }
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const formatMoney = (n: number) =>
+    n.toLocaleString("vi-VN", { maximumFractionDigits: 0 }) + "₫";
+
+  const filtered = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return items.filter((o) => {
+      const matchesQ =
+        !needle ||
+        o.order_code?.toLowerCase().includes(needle) ||
+        o.shipping_name?.toLowerCase().includes(needle) ||
+        o.phone?.toLowerCase().includes(needle);
+      const matchesStatus =
+        !statusFilter ||
+        (o.status || "").toLowerCase() === statusFilter.toLowerCase();
+      return matchesQ && matchesStatus;
+    });
+  }, [items, q, statusFilter]);
+
+  // ===== handlers =====
+  const openAddModal = () => {
+    setEditing(null);
+    setForm(emptyForm);
+    setOpen(true);
   };
 
-  useEffect(() => { fetchList(); }, []); // lần đầu
+  const openEditModal = (o: Order) => {
+    setEditing(o);
+    setForm({
+      order_code: o.order_code || "",
+      order_date: o.order_date
+        ? new Date(o.order_date).toISOString().slice(0, 16) // datetime-local
+        : "",
+      total_amount: String(o.total_amount ?? ""),
+      status: o.status || "Pending",
+      shipping_name: o.shipping_name || "",
+      phone: o.phone || "",
+    });
+    setOpen(true);
+  };
 
-  const onApplyFilter = () => fetchList();
+  const onSave = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const onUpdateStatus = async () => {
-    if (!detail) return;
+    if (!form.order_code) return toast.error("Vui lòng nhập mã đơn!");
+    const fd = new FormData();
+    fd.append("order_code", form.order_code);
+    fd.append("order_date", form.order_date || "");
+    fd.append("total_amount", form.total_amount || "");
+    fd.append("status", form.status || "");
+    fd.append("shipping_name", form.shipping_name || "");
+    fd.append("phone", form.phone || "");
+
+    const url = editing
+      ? `${ORDER_API}?id=${editing.order_id}`
+      : ORDER_API;
+
     try {
-      const fd = new FormData();
-      fd.append("status", upStatus);
-      const res = await fetch(`${API}?id=${detail.order.order_id}`, { method: "POST", body: fd });
+      const res = await fetch(url, { method: "POST", body: fd });
       const data = await res.json();
       if (data.success) {
-        toast.success("Đã cập nhật trạng thái");
-        setDetail((d) => (d ? { ...d, order: { ...d.order, status: upStatus } } : d));
-        fetchList();
-      } else toast.error(data.message || "Cập nhật thất bại");
+        toast.success(editing ? "Đã cập nhật đơn hàng" : "Đã tạo đơn hàng");
+        setOpen(false);
+        setEditing(null);
+        setForm(emptyForm);
+        fetchOrders();
+      } else {
+        toast.error(data.message || "Lỗi khi lưu đơn hàng!");
+      }
     } catch {
-      toast.error("Không thể cập nhật");
+      toast.error("Không thể gửi dữ liệu!");
     }
   };
 
   const onDelete = async (id: number) => {
     if (!confirm("Xoá đơn hàng này?")) return;
     try {
-      const res = await fetch(`${API}?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`${ORDER_API}?id=${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
-        toast.success("Đã xoá");
+        toast.success("Đã xoá đơn hàng");
         setItems((prev) => prev.filter((x) => x.order_id !== id));
-        if (detail?.order.order_id === id) setDetail(null);
-      } else toast.error(data.message || "Xoá thất bại");
+      } else toast.error(data.message || "Xoá thất bại!");
     } catch {
-      toast.error("Không thể xoá");
+      toast.error("Không thể xoá!");
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <Toaster position="top-right" />
-      <h1 className="text-2xl font-bold text-blue-700">📦 Đơn hàng</h1>
+  const totalOrders = items.length;
+  const totalRevenue = items.reduce(
+    (s, o) => s + Number(o.total_amount || 0),
+    0
+  );
 
-      {/* Filters */}
-      <div className="bg-white border rounded-xl p-4 grid md:grid-cols-5 gap-3">
-        <input
-          className="border p-2 rounded"
-          placeholder="🔍 Mã đơn / tên / điện thoại..."
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-        <select className="border p-2 rounded" value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="">-- Trạng thái --</option>
-          {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <input className="border p-2 rounded" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
-        <input className="border p-2 rounded" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-        <button onClick={onApplyFilter} className="bg-blue-600 text-white rounded px-4">Lọc</button>
+  return (
+    <div className="space-y-6 w-full">
+      <Toaster position="top-right" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+              📦
+            </span>
+            Quản lý đơn hàng
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Theo dõi trạng thái, khách hàng và tổng tiền đơn hàng.
+          </p>
+        </div>
+        <button
+          onClick={openAddModal}
+          className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 shadow-md text-sm"
+        >
+          <span className="text-lg leading-none">＋</span>
+          Tạo đơn mới
+        </button>
+      </div>
+
+      {/* Info + filter */}
+      <div className="admin-card p-4 space-y-3">
+        <div className="flex flex-wrap items-center gap-4 justify-between">
+          <div className="flex items-center gap-4 text-sm text-gray-700">
+            <div>
+              <div className="text-xs text-gray-400">Tổng đơn hàng</div>
+              <div className="font-semibold">
+                {totalOrders.toLocaleString("vi-VN")} đơn
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-400">Doanh thu</div>
+              <div className="font-semibold text-emerald-600">
+                {formatMoney(totalRevenue)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-3 mt-1">
+          <div className="relative flex-1 min-w-[220px]">
+            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">
+              🔍
+            </span>
+            <input
+              className="w-full pl-8 pr-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Tìm theo mã đơn, tên KH, SĐT…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+          </div>
+
+          <select
+            className="border p-2 rounded-lg text-sm min-w-[150px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="Pending">Pending</option>
+            <option value="Paid">Paid</option>
+            <option value="Processing">Processing</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white border rounded-xl overflow-auto">
+      <div className="admin-card overflow-auto">
         {loading ? (
-          <div className="p-6 text-center text-gray-400">Đang tải…</div>
-        ) : items.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">Không có đơn hàng</div>
+          <div className="p-6 text-center text-gray-400 animate-pulse">
+            Đang tải…
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            Không có đơn hàng
+          </div>
         ) : (
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-gray-600">
+            <thead className="bg-slate-50 text-slate-600">
               <tr>
                 <th className="p-2 text-left">Mã đơn</th>
+                <th className="p-2 text-left">Khách hàng</th>
+                <th className="p-2 text-left">SĐT</th>
                 <th className="p-2 text-left">Ngày đặt</th>
                 <th className="p-2 text-right">Tổng tiền</th>
-                <th className="p-2 text-left">Khách (nhận)</th>
-                <th className="p-2 text-left">SĐT</th>
-                <th className="p-2 text-left">Trạng thái</th>
+                <th className="p-2 text-center">Trạng thái</th>
                 <th className="p-2 text-center">Thao tác</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((o) => (
-                <tr key={o.order_id} className="border-t hover:bg-gray-50">
-                  <td className="p-2 font-medium">{o.order_code}</td>
-                  <td className="p-2">{o.order_date ? new Date(o.order_date).toLocaleString() : "—"}</td>
-                  <td className="p-2 text-right font-semibold text-blue-700">
-                    {Number(o.total_amount || 0).toLocaleString()}₫
+              {filtered.map((o) => (
+                <tr key={o.order_id} className="border-t hover:bg-slate-50/80">
+                  <td className="p-2 font-medium text-slate-800">
+                    {o.order_code}
                   </td>
-                  <td className="p-2">{o.shipping_name || "—"}</td>
-                  <td className="p-2">{o.shipping_phone || "—"}</td>
-                  <td className="p-2">
-                    <span className="px-2 py-1 rounded text-xs bg-gray-100">{o.status || "—"}</span>
+                  <td className="p-2">{o.shipping_name || "Khách lẻ"}</td>
+                  <td className="p-2 text-xs text-slate-600">
+                    {o.phone || "—"}
+                  </td>
+                  <td className="p-2 text-xs text-slate-500">
+                    {o.order_date
+                      ? new Date(o.order_date).toLocaleString("vi-VN")
+                      : "—"}
+                  </td>
+                  <td className="p-2 text-right font-semibold text-blue-700">
+                    {formatMoney(Number(o.total_amount || 0))}
+                  </td>
+                  <td className="p-2 text-center">
+                    <StatusBadge status={o.status || "Pending"} />
                   </td>
                   <td className="p-2 text-center space-x-2">
                     <button
-                      className="text-blue-600 hover:underline"
-                      onClick={() => fetchDetail(o.order_id)}
+                      className="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-lg text-xs font-medium"
+                      onClick={() => openEditModal(o)}
                     >
-                      Chi tiết
+                      ✏️ Sửa
                     </button>
                     <button
-                      className="text-red-600 hover:underline"
+                      className="px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg text-xs font-medium"
                       onClick={() => onDelete(o.order_id)}
                     >
-                      Xoá
+                      🗑️ Xoá
                     </button>
                   </td>
                 </tr>
@@ -186,80 +296,169 @@ export default function OrdersPage() {
         )}
       </div>
 
-      {/* Detail Modal */}
-      {detail && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl w-full max-w-3xl p-6 shadow-xl">
-            <div className="flex justify-between items-start">
-              <h2 className="text-lg font-semibold">Chi tiết đơn: {detail.order.order_code}</h2>
-              <button onClick={() => setDetail(null)} className="text-gray-500 hover:text-black">✖</button>
+      {/* Modal */}
+      {open && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-sky-500 px-6 py-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
+                    📦
+                  </span>
+                  {editing ? "Sửa đơn hàng" : "Tạo đơn hàng mới"}
+                </h2>
+                <p className="text-xs text-blue-100 mt-0.5">
+                  Cập nhật thông tin đơn hàng và trạng thái xử lý.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  setEditing(null);
+                  setForm(emptyForm);
+                }}
+                className="text-blue-50 hover:text-white text-xl leading-none"
+              >
+                ×
+              </button>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4 mt-4 text-sm">
-              <div className="border rounded p-3">
-                <div className="font-medium mb-2">Thông tin nhận hàng</div>
-                <div>Tên: {detail.order.shipping_name || "—"}</div>
-                <div>Điện thoại: {detail.order.shipping_phone || "—"}</div>
-                <div>Địa chỉ: {detail.order.shipping_address || "—"}</div>
+            <form onSubmit={onSave} className="grid grid-cols-2 gap-5 p-6">
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Mã đơn *
+                </label>
+                <input
+                  className="w-full mt-1 border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={form.order_code}
+                  onChange={(e) =>
+                    setForm({ ...form, order_code: e.target.value })
+                  }
+                  required
+                />
               </div>
-              <div className="border rounded p-3">
-                <div className="font-medium mb-2">Thông tin thanh toán</div>
-                <div>Tên: {detail.order.billing_name || "—"}</div>
-                <div>Điện thoại: {detail.order.billing_phone || "—"}</div>
-                <div>Địa chỉ: {detail.order.billing_address || "—"}</div>
-              </div>
-            </div>
 
-            <div className="mt-4 border rounded overflow-auto">
-              <table className="min-w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="p-2 text-left">Sản phẩm</th>
-                    <th className="p-2 text-right">Đơn giá</th>
-                    <th className="p-2 text-right">SL</th>
-                    <th className="p-2 text-right">Thành tiền</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detail.items.length === 0 ? (
-                    <tr><td className="p-3 text-center text-gray-500" colSpan={4}>Không có dòng hàng</td></tr>
-                  ) : (
-                    detail.items.map((it) => (
-                      <tr key={it.order_item_id} className="border-t">
-                        <td className="p-2">{it.product_name || `#${it.product_id}`}</td>
-                        <td className="p-2 text-right">{Number(it.unit_price||0).toLocaleString()}₫</td>
-                        <td className="p-2 text-right">{it.quantity}</td>
-                        <td className="p-2 text-right">
-                          {(Number(it.unit_price||0) * Number(it.quantity||0)).toLocaleString()}₫
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                Ngày đặt: {detail.order.order_date ? new Date(detail.order.order_date).toLocaleString() : "—"}
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Thời gian đặt
+                </label>
+                <input
+                  type="datetime-local"
+                  className="w-full mt-1 border rounded-lg p-3 text-sm"
+                  value={form.order_date}
+                  onChange={(e) =>
+                    setForm({ ...form, order_date: e.target.value })
+                  }
+                />
               </div>
-              <div className="text-right">
-                <div className="text-sm">Tổng tiền</div>
-                <div className="text-xl font-bold text-blue-700">
-                  {Number(detail.order.total_amount || 0).toLocaleString()}₫
-                </div>
-              </div>
-            </div>
 
-            <div className="mt-4 flex items-center gap-3">
-              <select className="border p-2 rounded" value={upStatus} onChange={(e) => setUpStatus(e.target.value)}>
-                {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-              <button onClick={onUpdateStatus} className="bg-blue-600 text-white px-4 py-2 rounded">Cập nhật trạng thái</button>
-            </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Tổng tiền (₫)
+                </label>
+                <input
+                  type="number"
+                  className="w-full mt-1 border rounded-lg p-3 text-sm"
+                  value={form.total_amount}
+                  onChange={(e) =>
+                    setForm({ ...form, total_amount: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Trạng thái
+                </label>
+                <select
+                  className="w-full mt-1 border rounded-lg p-3 text-sm bg-white"
+                  value={form.status}
+                  onChange={(e) =>
+                    setForm({ ...form, status: e.target.value })
+                  }
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Khách hàng
+                </label>
+                <input
+                  className="w-full mt-1 border rounded-lg p-3 text-sm"
+                  value={form.shipping_name}
+                  onChange={(e) =>
+                    setForm({ ...form, shipping_name: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Số điện thoại
+                </label>
+                <input
+                  className="w-full mt-1 border rounded-lg p-3 text-sm"
+                  value={form.phone}
+                  onChange={(e) =>
+                    setForm({ ...form, phone: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="col-span-2 flex justify-end gap-3 mt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    setEditing(null);
+                    setForm(emptyForm);
+                  }}
+                  className="px-5 py-2.5 border rounded-lg hover:bg-gray-50 text-sm text-gray-700"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 text-sm"
+                >
+                  {editing ? "Cập nhật" : "Lưu đơn hàng"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+// badge giống dashboard
+function StatusBadge({ status }: { status: string }) {
+  const normalized = (status || "").toLowerCase();
+  let color = "bg-slate-100 text-slate-700 border-slate-200";
+
+  if (normalized.includes("pending")) {
+    color = "bg-amber-50 text-amber-700 border-amber-200";
+  } else if (normalized.includes("paid") || normalized.includes("processing")) {
+    color = "bg-sky-50 text-sky-700 border-sky-200";
+  } else if (normalized.includes("completed")) {
+    color = "bg-emerald-50 text-emerald-700 border-emerald-200";
+  } else if (normalized.includes("cancel")) {
+    color = "bg-rose-50 text-rose-700 border-rose-200";
+  }
+
+  return (
+    <span
+      className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full border text-[11px] font-medium ${color}`}
+    >
+      {status || "—"}
+    </span>
   );
 }

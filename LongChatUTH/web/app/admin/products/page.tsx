@@ -15,15 +15,17 @@ type Product = {
 type FormState = {
   name: string;
   price: string | number;
-  category: string;          // lưu tên danh mục (đúng theo backend hiện tại)
+  category: string; // lưu tên danh mục (đúng theo backend hiện tại)
   manufacturer: string;
-  image: File | null;        // chỉ có File khi chọn ảnh mới
+  image: File | null; // chỉ có File khi chọn ảnh mới
 };
 
 type Category = { id: string | number; name: string };
 
-const API = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/products.php";
-const CAT_API = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/categories.php";
+const API =
+  "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/products.php";
+const CAT_API =
+  "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/categories.php";
 
 const initialForm: FormState = {
   name: "",
@@ -71,10 +73,12 @@ export default function AdminProducts() {
     try {
       const res = await fetch(CAT_API);
       const data = await res.json();
-      setCategories((data.items || []).map((c: any) => ({
-        id: c.id ?? c.category_id ?? c.name,
-        name: c.name ?? String(c),
-      })));
+      setCategories(
+        (data.items || []).map((c: any) => ({
+          id: c.id ?? c.category_id ?? c.name,
+          name: c.name ?? String(c),
+        }))
+      );
     } catch {
       toast.error("Không tải được danh mục!");
     }
@@ -86,7 +90,10 @@ export default function AdminProducts() {
   }, []);
 
   const manufacturers = useMemo(
-    () => Array.from(new Set(items.map((x) => x.manufacturer))).filter(Boolean) as string[],
+    () =>
+      Array.from(new Set(items.map((x) => x.manufacturer))).filter(
+        Boolean
+      ) as string[],
     [items]
   );
 
@@ -99,7 +106,8 @@ export default function AdminProducts() {
         p.category?.toLowerCase().includes(needle) ||
         p.manufacturer?.toLowerCase().includes(needle);
       const matchesCat = !categoryFilter || p.category === categoryFilter;
-      const matchesManu = !manufacturerFilter || p.manufacturer === manufacturerFilter;
+      const matchesManu =
+        !manufacturerFilter || p.manufacturer === manufacturerFilter;
       return matchesQ && matchesCat && matchesManu;
     });
   }, [items, q, categoryFilter, manufacturerFilter]);
@@ -119,7 +127,7 @@ export default function AdminProducts() {
       price: String(p.price ?? ""),
       category: p.category || "",
       manufacturer: p.manufacturer || "",
-      image: null,                // không gán string -> để backend giữ ảnh cũ nếu không upload mới
+      image: null, // không gán string -> để backend giữ ảnh cũ nếu không upload mới
     });
     setPreview(p.image || null);
     setOpen(true);
@@ -142,10 +150,8 @@ export default function AdminProducts() {
     fd.append("manufacturer", form.manufacturer || "");
 
     if (form.image) {
-      // Có chọn ảnh mới → gửi file
       fd.append("image", form.image);
     } else if (editing?.image) {
-      // Không chọn ảnh mới, đang sửa sản phẩm có sẵn ảnh → gửi lại URL cũ
       fd.append("image", editing.image);
     }
 
@@ -169,7 +175,6 @@ export default function AdminProducts() {
     }
   };
 
-
   const onDelete = async (id: number) => {
     if (!confirm("Xoá sản phẩm này?")) return;
     try {
@@ -184,55 +189,112 @@ export default function AdminProducts() {
     }
   };
 
+  const totalProducts = items.length;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <Toaster position="top-right" />
 
-      {/* Header */}
+      {/* Header VIP */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-blue-700">💊 Quản lý sản phẩm</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            {/* icon pill */}
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+              💊
+            </span>
+            Quản lý sản phẩm
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Theo dõi kho thuốc, dược mỹ phẩm và cập nhật giá bán.
+          </p>
+        </div>
         <button
           onClick={openAddModal}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow"
+          className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 shadow-md text-sm"
         >
-          ➕ Thêm sản phẩm
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 4V16M4 10H16"
+              stroke="white"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+          Thêm sản phẩm
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white border rounded-xl shadow-sm p-4 flex flex-wrap gap-3">
-        <input
-          className="flex-1 p-2 border rounded-lg min-w-[220px]"
-          placeholder="🔍 Tìm theo tên / danh mục / NSX…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-        <select
-          className="border p-2 rounded-lg"
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="">-- Danh mục --</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.name}>{c.name}</option>
-          ))}
-        </select>
-        <select
-          className="border p-2 rounded-lg"
-          value={manufacturerFilter}
-          onChange={(e) => setManufacturerFilter(e.target.value)}
-        >
-          <option value="">-- Nhà sản xuất --</option>
-          {manufacturers.map((m) => (
-            <option key={m}>{m}</option>
-          ))}
-        </select>
+      {/* Info / filter card */}
+      <div className="admin-card p-4 flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600 text-xs">
+              {totalProducts.toLocaleString("vi-VN")}
+            </span>
+            <span>
+              Tổng số sản phẩm{" "}
+              <span className="font-medium text-gray-800">
+                {totalProducts.toLocaleString("vi-VN")}
+              </span>
+            </span>
+          </div>
+          <div className="hidden md:flex items-center gap-2 text-xs text-gray-400">
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+            Dữ liệu realtime từ API PHP
+          </div>
+        </div>
+
+        <div className="mt-2 flex flex-wrap gap-3">
+          <div className="relative flex-1 min-w-[220px]">
+            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">
+              🔍
+            </span>
+            <input
+              className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Tìm theo tên, danh mục, nhà sản xuất…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+          </div>
+
+          <select
+            className="border p-2 rounded-lg text-sm min-w-[150px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
+            <option value="">Tất cả danh mục</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="border p-2 rounded-lg text-sm min-w-[150px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            value={manufacturerFilter}
+            onChange={(e) => setManufacturerFilter(e.target.value)}
+          >
+            <option value="">Tất cả nhà sản xuất</option>
+            {manufacturers.map((m) => (
+              <option key={m}>{m}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white border rounded-xl shadow-sm overflow-auto">
+      <div className="admin-card overflow-auto">
         {loading ? (
-          <div className="p-6 text-center text-gray-400 animate-pulse">Đang tải…</div>
+          <div className="p-6 text-center text-gray-400 animate-pulse">
+            Đang tải…
+          </div>
         ) : filtered.length === 0 ? (
           <div className="p-6 text-center text-gray-500">Không có sản phẩm</div>
         ) : (
@@ -259,20 +321,20 @@ export default function AdminProducts() {
                   <td className="p-2">{p.name}</td>
                   <td className="p-2 text-center text-blue-700 font-semibold">
                     {p.price && !isNaN(Number(p.price))
-                      ? Number(p.price).toLocaleString() + "₫"
+                      ? Number(p.price).toLocaleString("vi-VN") + "₫"
                       : "—"}
                   </td>
                   <td className="p-2 text-center">{p.category}</td>
                   <td className="p-2 text-center">{p.manufacturer}</td>
                   <td className="p-2 text-center space-x-2">
                     <button
-                      className="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-lg"
+                      className="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-lg text-xs font-medium"
                       onClick={() => openEditModal(p)}
                     >
                       🖊️ Sửa
                     </button>
                     <button
-                      className="px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg"
+                      className="px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg text-xs font-medium"
                       onClick={() => onDelete(p.id)}
                     >
                       🗑️ Xoá
@@ -285,56 +347,137 @@ export default function AdminProducts() {
         )}
       </div>
 
-      {/* Modal Add/Edit */}
+      {/* Modal Add/Edit – VIP */}
       {open && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-lg">
-            <h2 className="text-lg font-semibold mb-4">
-              {editing ? "✏️ Sửa sản phẩm" : "➕ Thêm sản phẩm"}
-            </h2>
-            <form onSubmit={onSave} className="space-y-3">
-              <input
-                className="w-full border p-2 rounded-lg"
-                placeholder="Tên sản phẩm"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
-              />
-              <input
-                className="w-full border p-2 rounded-lg"
-                placeholder="Giá"
-                type="number"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-              />
-
-              {/* Dropdown danh mục */}
-              <select
-                className="w-full border p-2 rounded-lg"
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all duration-200">
+            {/* Header xanh Long Châu */}
+            <div className="bg-gradient-to-r from-blue-600 to-sky-500 px-6 py-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10 4V16M4 10H16"
+                        stroke="white"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </span>
+                  {editing ? "Sửa sản phẩm" : "Thêm sản phẩm mới"}
+                </h2>
+                <p className="text-xs text-blue-100 mt-0.5">
+                  Nhập đầy đủ thông tin để quản lý kho thuốc chính xác.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  setEditing(null);
+                  setForm(initialForm);
+                  setPreview(null);
+                }}
+                className="text-blue-50 hover:text-white text-xl leading-none"
               >
-                <option value="">-- Chọn danh mục --</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.name}>{c.name}</option>
-                ))}
-              </select>
+                ×
+              </button>
+            </div>
 
-              <input
-                className="w-full border p-2 rounded-lg"
-                placeholder="Nhà sản xuất"
-                value={form.manufacturer}
-                onChange={(e) => setForm({ ...form, manufacturer: e.target.value })}
-              />
-
-              <div className="flex items-center gap-3">
-                <input type="file" accept="image/*" onChange={onPickImage} />
-                {preview && (
-                  <img src={preview} className="w-16 h-16 rounded-lg border object-cover" />
-                )}
+            {/* Body */}
+            <form onSubmit={onSave} className="grid grid-cols-2 gap-5 p-6">
+              {/* Tên sản phẩm */}
+              <div className="col-span-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Tên sản phẩm *
+                </label>
+                <input
+                  className="w-full mt-1 border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="VD: Paracetamol 500mg"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                />
               </div>
 
-              <div className="flex justify-end gap-3 mt-4">
+              {/* Giá bán */}
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Giá bán (₫)
+                </label>
+                <input
+                  type="number"
+                  className="w-full mt-1 border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="VD: 25000"
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                />
+              </div>
+
+              {/* Danh mục */}
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Danh mục
+                </label>
+                <select
+                  className="w-full mt-1 border rounded-lg p-3 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={form.category}
+                  onChange={(e) =>
+                    setForm({ ...form, category: e.target.value })
+                  }
+                >
+                  <option value="">-- Chọn danh mục --</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Nhà sản xuất */}
+              <div className="col-span-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Nhà sản xuất
+                </label>
+                <input
+                  className="w-full mt-1 border rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="VD: Dược Hậu Giang"
+                  value={form.manufacturer}
+                  onChange={(e) =>
+                    setForm({ ...form, manufacturer: e.target.value })
+                  }
+                />
+              </div>
+
+              {/* Upload ảnh */}
+              <div className="col-span-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Hình ảnh sản phẩm
+                </label>
+                <div className="flex items-center gap-4 mt-1">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={onPickImage}
+                    className="border p-2 rounded-lg text-sm"
+                  />
+                  {preview && (
+                    <img
+                      src={preview}
+                      className="w-20 h-20 rounded-lg border object-cover shadow"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="col-span-2 flex justify-end gap-3 mt-4">
                 <button
                   type="button"
                   onClick={() => {
@@ -343,15 +486,15 @@ export default function AdminProducts() {
                     setForm(initialForm);
                     setPreview(null);
                   }}
-                  className="border px-4 py-2 rounded-lg hover:bg-gray-50"
+                  className="px-5 py-2.5 border rounded-lg hover:bg-gray-50 text-sm text-gray-700"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  className="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 text-sm"
                 >
-                  Lưu
+                  {editing ? "Cập nhật" : "Lưu sản phẩm"}
                 </button>
               </div>
             </form>

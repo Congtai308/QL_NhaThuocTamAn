@@ -48,7 +48,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen from-[#eef5ff] to-[#f8fbff]">
+    <main className="min-h-screen bg-gradient-to-b from-[#e3f0ff] via-[#f3f7ff] to-[#ffffff]">
       {/* Ribbon mảnh trên cùng */}
       <div className="w-full bg-[#0a56c5] text-white text-[13px]">
         <div className="max-w-6xl mx-auto px-4 h-9 sm:h-10 flex items-center justify-between">

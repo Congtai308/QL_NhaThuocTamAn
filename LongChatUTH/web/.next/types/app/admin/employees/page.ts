@@ -1,4 +1,4 @@
-// File: C:\xampp\htdocs\LongChatUTH\web\app\admin\employees\page.tsx
+// File: C:\xampp\htdocs\QL_NhaThuocTamAn\LongChatUTH\web\app\admin\employees\page.tsx
 import * as entry from '../../../../../app/admin/employees/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

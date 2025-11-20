@@ -7,7 +7,7 @@ import SearchBar from "./SearchBar";
 import AuthButtons from "@/components/nav/AuthButtons";
 import { useCart, money } from "@/lib/cart";
 import { useCartUi } from "@/lib/cart-ui";
-
+import CartPreview from "@/components/CartPreview";
 export default function Header() {
   // Đọc dữ liệu cart
   const count = useCart((s) => s.count());
@@ -68,31 +68,19 @@ export default function Header() {
           <AuthButtons />
         </div>
 
-        {/* Cart */}
-        <div className="relative ml-2">
-          <Link
-            href="/cart"
-            className="relative rounded-lg border px-3 py-2 hover:bg-slate-50 flex items-center gap-2"
-          >
-            <span role="img" aria-label="cart">
-              🧺
-            </span>
-            <span className="hidden sm:inline text-sm">Giỏ hàng</span>
-            {count > 0 && (
-              <span className="absolute -top-2 -right-2 text-[11px] bg-blue-700 text-white rounded-full px-1.5 py-0.5">
-                {count}
-              </span>
-            )}
-          </Link>
+        {/* Cart + Mini Cart + Peek */}
+        <div className="relative">
+          {/* Mini-cart hover */}
+          <CartPreview />
 
+          {/* Peek popup khi JUST thêm vào giỏ */}
           {peekVisible && peekItem && (
-            <div className="absolute right-0 mt-3 w-[320px] rounded-2xl border bg-white shadow-2xl p-4 transition duration-200">
+            <div className="absolute right-0 mt-3 w-[320px] rounded-2xl border bg-white shadow-2xl p-4 transition duration-200 z-50">
               <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">
                 Đã thêm vào giỏ hàng
               </div>
               <div className="flex gap-3">
                 <div className="w-14 h-14 rounded-xl bg-slate-50 border flex items-center justify-center overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={peekItem.image || "/placeholder.png"}
                     alt={peekItem.name}
@@ -107,9 +95,7 @@ export default function Header() {
                     {peekItem.qty} {peekItem.unit || "Sản phẩm"}
                   </div>
                   <div className="text-base font-semibold text-blue-800 mt-1">
-                    {peekItem.price
-                      ? money(peekItem.price)
-                      : peekItem.priceText || "Liên hệ"}
+                    {peekItem.price ? money(peekItem.price) : "Liên hệ"}
                   </div>
                 </div>
               </div>
@@ -120,6 +106,7 @@ export default function Header() {
                   Có {count} sản phẩm trong giỏ
                 </span>
               </div>
+
               <div className="mt-3">
                 <Link
                   href="/cart"

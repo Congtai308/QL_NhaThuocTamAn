@@ -1,4 +1,6 @@
 // lib/cart.ts
+"use client";
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -26,32 +28,42 @@ export const useCart = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+
+      // thêm sản phẩm vào giỏ (nếu có rồi thì cộng qty)
       add: (base, qty = 1) => {
         const items = [...get().items];
         const idx = items.findIndex((i) => i.id === base.id);
         if (idx > -1) {
-          items[idx].qty += qty;
+          items[idx] = { ...items[idx], qty: items[idx].qty + qty };
         } else {
           items.push({ ...base, qty });
         }
         set({ items });
       },
+
       setQty: (id, qty) => {
         const items = get().items.map((i) => (i.id === id ? { ...i, qty } : i));
         set({ items });
       },
+
       inc: (id, delta = 1) => {
         const items = get().items.map((i) =>
           i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i
         );
         set({ items });
       },
+
       remove: (id) => set({ items: get().items.filter((i) => i.id !== id) }),
+
       clear: () => set({ items: [] }),
-      count: () => get().items.reduce((s, i) => s + i.qty, 0),
-      subtotal: () => get().items.reduce((s, i) => s + i.qty * i.price, 0),
+
+      count: () => get().items.reduce((sum, i) => sum + i.qty, 0),
+
+      subtotal: () => get().items.reduce((sum, i) => sum + i.qty * i.price, 0),
     }),
-    { name: "lc-cart" }
+    {
+      name: "nta-cart", // key mới, 1 giỏ duy nhất / trình duyệt
+    }
   )
 );
 

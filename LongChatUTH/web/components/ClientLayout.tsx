@@ -5,15 +5,30 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
+export default function ClientLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const [fade, setFade] = useState(false);
 
+  // 👇 Các trang admin / employee: dùng layout riêng, KHÔNG qua ClientLayout
+  const isAdminPage =
+    pathname?.startsWith("/admin") || pathname?.startsWith("/employee");
+
+  if (isAdminPage) {
+    // Không header user, không max-width, không hiệu ứng gì hết
+    return <>{children}</>;
+  }
+
+  // 👇 Các trang user bình thường
   const isPlainPage =
     pathname?.startsWith("/products/") ||
     pathname?.startsWith("/cart") ||
     pathname?.startsWith("/checkout");
 
+  // Hiệu ứng fade khi chuyển trang
   useEffect(() => {
     setFade(true);
     const timer = setTimeout(() => setFade(false), 300);
@@ -28,7 +43,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     >
       <Header />
 
-      {/* ✅ Hiệu ứng slide-up khi chuyển trang */}
+      {/* slide-up khi đổi trang */}
       <AnimatePresence mode="wait">
         <motion.main
           key={pathname}

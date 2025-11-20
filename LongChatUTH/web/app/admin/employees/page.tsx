@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useMemo, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 
@@ -10,7 +11,8 @@ type Employee = {
   title: string;
 };
 
-const API = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/employees.php";
+const API =
+  "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/employees.php";
 
 const initialForm = { full_name: "", phone: "", email: "", title: "" };
 
@@ -20,7 +22,7 @@ export default function EmployeesPage() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Employee | null>(null);
   const [form, setForm] = useState(initialForm);
-  const [open, setOpen] = useState(false); // điều khiển modal
+  const [open, setOpen] = useState(false);
 
   const fetchEmployees = async () => {
     try {
@@ -35,19 +37,25 @@ export default function EmployeesPage() {
     }
   };
 
-  useEffect(() => { fetchEmployees(); }, []);
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
+    if (!q) return items;
     return items.filter((e) =>
-      e.full_name.toLowerCase().includes(q) ||
-      e.phone.toLowerCase().includes(q) ||
-      e.email.toLowerCase().includes(q) ||
-      (e.title || "").toLowerCase().includes(q)
+      [e.full_name, e.phone, e.email, e.title || ""]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
     );
   }, [items, search]);
 
-  const resetForm = () => { setEditing(null); setForm(initialForm); };
+  const resetForm = () => {
+    setEditing(null);
+    setForm(initialForm);
+  };
 
   const onSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +64,7 @@ export default function EmployeesPage() {
       toast.error("Vui lòng nhập đầy đủ Họ tên / SĐT / Email!");
       return;
     }
+
     const fd = new FormData();
     fd.append("full_name", form.full_name);
     fd.append("phone", form.phone);
@@ -86,7 +95,7 @@ export default function EmployeesPage() {
       const res = await fetch(`${API}?id=${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
-        toast.success("Đã xoá");
+        toast.success("Đã xoá nhân viên");
         setItems((prev) => prev.filter((x) => x.employee_id !== id));
       } else toast.error(data.message || "Xoá thất bại!");
     } catch {
@@ -95,35 +104,65 @@ export default function EmployeesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <Toaster position="top-right" />
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-blue-700">👨‍⚕️ Quản lý nhân viên</h1>
+
+      {/* Header + KPI nhỏ */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-blue-700 flex items-center gap-2">
+            👨‍⚕️ Quản lý nhân viên
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Theo dõi danh sách nhân viên, vai trò và thông tin liên hệ.
+          </p>
+        </div>
         <button
-          onClick={() => { resetForm(); setOpen(true); }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow"
+          onClick={() => {
+            resetForm();
+            setOpen(true);
+          }}
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
         >
-          ➕ Thêm nhân viên
+          <span className="text-lg">➕</span> Thêm nhân viên
         </button>
       </div>
 
-      <div className="bg-white border rounded-lg p-4">
-        <input
-          className="w-full border p-2 rounded"
-          placeholder="🔍 Tìm theo tên, email, SĐT..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      {/* Filter card */}
+      <div className="admin-card flex flex-wrap items-center gap-3 p-4">
+        <div className="flex-1 min-w-[240px] relative">
+          <span className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
+            🔍
+          </span>
+          <input
+            className="w-full rounded-lg border border-slate-200 bg-slate-50/60 py-2 pl-9 pr-3 text-sm outline-none ring-0 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+            placeholder="Tìm theo tên, email, SĐT, chức vụ…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="text-xs text-slate-400">
+          Tổng:{" "}
+          <span className="font-semibold text-slate-700">
+            {filtered.length}
+          </span>{" "}
+          nhân viên
+        </div>
       </div>
 
-      <div className="bg-white border rounded-lg overflow-auto">
+      {/* Table card */}
+      <div className="admin-card overflow-auto">
         {loading ? (
-          <div className="p-6 text-center text-gray-400">Đang tải...</div>
+          <div className="p-6 text-center text-gray-400 animate-pulse">
+            Đang tải…
+          </div>
         ) : filtered.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">Chưa có nhân viên</div>
+          <div className="p-6 text-center text-gray-500">
+            Chưa có nhân viên phù hợp.
+          </div>
         ) : (
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-gray-600">
+            <thead className="bg-slate-50 text-slate-600">
               <tr>
                 <th className="p-2 text-left">Họ tên</th>
                 <th className="p-2 text-left">Số điện thoại</th>
@@ -134,14 +173,19 @@ export default function EmployeesPage() {
             </thead>
             <tbody>
               {filtered.map((e) => (
-                <tr key={e.employee_id} className="border-t hover:bg-gray-50">
-                  <td className="p-2">{e.full_name}</td>
+                <tr
+                  key={e.employee_id}
+                  className="border-t hover:bg-slate-50/80"
+                >
+                  <td className="p-2 font-medium text-slate-800">
+                    {e.full_name}
+                  </td>
                   <td className="p-2">{e.phone}</td>
                   <td className="p-2">{e.email}</td>
-                  <td className="p-2">{e.title}</td>
-                  <td className="p-2 text-center space-x-3">
+                  <td className="p-2 text-slate-600">{e.title || "—"}</td>
+                  <td className="p-2 text-center space-x-2">
                     <button
-                      className="text-blue-600 hover:underline"
+                      className="inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
                       onClick={() => {
                         setEditing(e);
                         setForm({
@@ -153,13 +197,13 @@ export default function EmployeesPage() {
                         setOpen(true);
                       }}
                     >
-                      Sửa
+                      🖊️ Sửa
                     </button>
                     <button
-                      className="text-red-600 hover:underline"
+                      className="inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
                       onClick={() => onDelete(e.employee_id)}
                     >
-                      Xoá
+                      🗑️ Xoá
                     </button>
                   </td>
                 </tr>
@@ -171,46 +215,106 @@ export default function EmployeesPage() {
 
       {/* Modal thêm/sửa */}
       {open && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
-            <h2 className="text-lg font-semibold mb-4">
-              {editing ? "✏️ Sửa nhân viên" : "➕ Thêm nhân viên"}
-            </h2>
-            <form onSubmit={onSave} className="space-y-3">
-              <input
-                className="w-full border p-2 rounded"
-                placeholder="Họ tên"
-                value={form.full_name}
-                onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                required
-              />
-              <input
-                className="w-full border p-2 rounded"
-                placeholder="Số điện thoại"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                required
-              />
-              <input
-                className="w-full border p-2 rounded"
-                placeholder="Email"
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
-              />
-              <input
-                className="w-full border p-2 rounded"
-                placeholder="Chức vụ"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-              />
-              <div className="flex justify-end gap-3 mt-4">
-                <button type="button" onClick={() => setOpen(false)} className="border px-4 py-2 rounded">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm">
+          <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl">
+            {/* header gradient */}
+            <div className="bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 px-6 py-4 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-semibold">
+                    {editing
+                      ? "✏️ Sửa thông tin nhân viên"
+                      : "➕ Thêm nhân viên"}
+                  </h2>
+                  <p className="mt-1 text-xs text-blue-50/90">
+                    Điền đầy đủ thông tin để dễ dàng quản lý ca làm và phân
+                    quyền.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    resetForm();
+                  }}
+                  className="rounded-full bg-white/15 px-2 py-1 text-xs hover:bg-white/25"
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={onSave} className="space-y-3 p-6">
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">
+                    Họ tên *
+                  </label>
+                  <input
+                    className="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                    value={form.full_name}
+                    onChange={(e) =>
+                      setForm({ ...form, full_name: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">
+                    Số điện thoại *
+                  </label>
+                  <input
+                    className="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                    value={form.phone}
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    className="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                    value={form.email}
+                    onChange={(e) =>
+                      setForm({ ...form, email: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">
+                    Chức vụ
+                  </label>
+                  <input
+                    className="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                    value={form.title}
+                    onChange={(e) =>
+                      setForm({ ...form, title: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    resetForm();
+                  }}
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                >
                   Hủy
                 </button>
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-                  Lưu
+                <button
+                  type="submit"
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700"
+                >
+                  Lưu nhân viên
                 </button>
               </div>
             </form>

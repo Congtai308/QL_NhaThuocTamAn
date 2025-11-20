@@ -1,14 +1,44 @@
 "use client";
 
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import { AnimatePresence, motion } from "framer-motion";
+import AuthCard, { AuthCardMode } from "@/components/auth/AuthCard";
 
 export default function AuthButtons() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
 
-  // Tránh nháy nội dung khi session đang load
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<AuthCardMode>("login");
+
+  // mở popup với mode tương ứng
+  const openModal = (m: AuthCardMode) => {
+    setMode(m);
+    setOpen(true);
+    if (typeof document !== "undefined") {
+      document.body.style.overflow = "hidden";
+    }
+  };
+
+  const closeModal = () => {
+    setOpen(false);
+    if (typeof document !== "undefined") {
+      document.body.style.overflow = "";
+    }
+  };
+
+  // cleanup khi unmount
+  useEffect(() => {
+    return () => {
+      if (typeof document !== "undefined") {
+        document.body.style.overflow = "";
+      }
+    };
+  }, []);
+
+  // loading session → skeleton
   if (status === "loading") {
     return (
       <div className="h-9 flex items-center">
@@ -17,31 +47,30 @@ export default function AuthButtons() {
     );
   }
 
-  // Đã đăng nhập -> chào + hiển thị vai trò + nút Đăng xuất
+  // Đã đăng nhập → chào + vai trò + nút đăng xuất
   if (session?.user) {
     const displayName = session.user.name || session.user.email || "Người dùng";
     const role = (session.user as any).role || "user";
 
     return (
       <div className="flex items-center gap-3">
-        <span className="text-sm text-slate-700">
-          👋 Xin chào {displayName}
+        <span className="hidden sm:inline text-sm text-slate-100/90">
+          👋 Xin chào <span className="font-semibold">{displayName}</span>
         </span>
         <span
-          className={`text-xs px-2 py-1 rounded-full border ${
+          className={`text-[11px] px-2 py-1 rounded-full border bg-white/95 ${
             role === "admin"
-              ? "bg-red-100 text-red-700 border-red-300"
+              ? "text-red-600 border-red-200"
               : role === "employee"
-              ? "bg-amber-100 text-amber-700 border-amber-300"
-              : "bg-emerald-100 text-emerald-700 border-emerald-300"
+              ? "text-amber-600 border-amber-200"
+              : "text-emerald-600 border-emerald-200"
           }`}
-          title="Vai trò"
         >
           {role.toUpperCase()}
         </span>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="rounded-xl px-4 py-2 text-sm font-semibold transition-colors border
+          className="rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-colors border
                      bg-white text-[#0a56c5] border-[#0a56c5] hover:bg-blue-50
                      active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
         >
@@ -51,12 +80,12 @@ export default function AuthButtons() {
     );
   }
 
-  // Chưa đăng nhập -> hiện 2 nút (logic tô xanh nút đang ở trang tương ứng)
+  // Chưa đăng nhập → 2 nút Đăng ký / Đăng nhập (mở popup, không đổi route)
   const isLogin = pathname === "/login";
   const isRegister = pathname === "/register";
 
   const base =
-    "rounded-xl px-4 py-2 text-sm font-semibold transition-colors border active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-offset-1";
+    "rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-colors border active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-offset-1";
   const solid =
     "bg-[#0a56c5] text-white border-[#0a56c5] hover:bg-blue-700 focus:ring-blue-300";
   const outline =
@@ -65,16 +94,65 @@ export default function AuthButtons() {
   const loginClass =
     !isLogin && !isRegister ? `${base} ${solid}` : `${base} ${isLogin ? solid : outline}`;
   const registerClass =
-    !isLogin && !isRegister ? `${base} ${solid}` : `${base} ${isRegister ? solid : outline}`;
+    !isLogin && !isRegister ? `${base} ${outline}` : `${base} ${isRegister ? solid : outline}`;
 
   return (
-    <div className="flex items-center gap-3">
-      <Link href="/register" className={registerClass} aria-current={isRegister ? "page" : undefined}>
-        Đăng ký
-      </Link>
-      <Link href="/login" className={loginClass} aria-current={isLogin ? "page" : undefined}>
-        Đăng nhập
-      </Link>
-    </div>
+    <>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => openModal("register")}
+          className={registerClass}
+        >
+          Đăng ký
+        </button>
+        <button
+          type="button"
+          onClick={() => openModal("login")}
+          className={loginClass}
+        >
+          Đăng nhập
+        </button>
+      </div>
+
+      {/* 🔥 Popup đăng nhập/đăng ký – blur nền + zoom giống Long Châu */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="auth-backdrop"
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeModal}
+          >
+            <motion.div
+              key="auth-modal"
+              initial={{ opacity: 0, scale: 0.9, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 24 }}
+              transition={{ duration: 0.22, ease: [0.22, 0.8, 0.25, 1] }}
+              className="w-full max-w-md mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative">
+                {/* nút đóng góc phải */}
+                <button
+                  onClick={closeModal}
+                  className="absolute -top-3 -right-3 z-10 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md text-slate-500 hover:text-slate-700"
+                >
+                  ✕
+                </button>
+                <AuthCard
+                  mode={mode}
+                  onClose={closeModal}
+                  onSwitchMode={(m) => setMode(m)}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

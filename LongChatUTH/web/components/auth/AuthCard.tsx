@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Phone,
   Mail,
@@ -16,10 +16,22 @@ import { signIn } from "next-auth/react";
 
 export type AuthCardMode = "login" | "register";
 
-export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
+type Props = {
+  mode?: AuthCardMode;
+  onClose?: () => void;
+  onSwitchMode?: (mode: AuthCardMode) => void;
+};
+
+type Step = "phone" | "otp" | "done";
+
+export default function AuthCard({
+  mode = "login",
+  onClose,
+  onSwitchMode,
+}: Props) {
   const router = useRouter();
-  const [step, setStep] = React.useState<"phone" | "otp" | "done">("phone");
-  const [method, setMethod] = React.useState<"phone" | "email">("email"); // mặc định tab Email
+  const [step, setStep] = React.useState<Step>("phone");
+  const [method, setMethod] = React.useState<"phone" | "email">("email");
   const [phone, setPhone] = React.useState("");
   const [otp, setOtp] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -30,14 +42,34 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
       ? "Vui lòng đăng nhập để hưởng những đặc quyền dành cho thành viên."
       : "Tạo tài khoản để nhận ưu đãi, theo dõi đơn hàng và tích điểm.";
 
-  function handleContinue() {
-    if (/^0\d{9}$/.test(phone)) setStep("otp");
-  }
-  function handleVerify() {
-    if (/^\d{4,6}$/.test(otp)) setStep("done");
+  // reset step khi đổi mode (login <-> register) từ bên ngoài
+  React.useEffect(() => {
+    setStep("phone");
+    setMethod("email");
+    setOtp("");
+    setPhone("");
+    setLoading(false);
+  }, [mode]);
+
+  // ---- PHONE + OTP (demo UI, chưa nối backend) ----
+  function handleContinuePhone() {
+    if (!/^0\d{9}$/.test(phone)) {
+      alert("Vui lòng nhập số điện thoại hợp lệ (10 số, bắt đầu bằng 0).");
+      return;
+    }
+    setStep("otp");
   }
 
-  // ✅ Gọi NextAuth thay cho fetch PHP trực tiếp
+  function handleVerifyOtp() {
+    if (!/^\d{4,6}$/.test(otp)) {
+      alert("Vui lòng nhập mã OTP 4–6 số.");
+      return;
+    }
+    // Ở đây bạn có thể call API OTP thật, nếu thành công thì:
+    setStep("done");
+  }
+
+  // ---- EMAIL + PASSWORD (NextAuth + PHP) ----
   async function submitEmail(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
@@ -51,20 +83,30 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
       setLoading(true);
 
       if (mode === "register") {
-        // ✅ Validate nhanh
-        if (!name.trim()) return alert("Vui lòng nhập họ và tên.");
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-          return alert("Email không hợp lệ.");
-        if (password.length < 6) return alert("Mật khẩu tối thiểu 6 ký tự.");
-        if (password !== confirm) return alert("Mật khẩu xác nhận không khớp.");
+        if (!name.trim()) {
+          alert("Vui lòng nhập họ và tên.");
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          alert("Email không hợp lệ.");
+          return;
+        }
+        if (password.length < 6) {
+          alert("Mật khẩu tối thiểu 6 ký tự.");
+          return;
+        }
+        if (password !== confirm) {
+          alert("Mật khẩu xác nhận không khớp.");
+          return;
+        }
 
-        // 🔹 Gọi API PHP để đăng ký
+        // Gọi API PHP để đăng ký
         const res = await fetch(
           "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/register.php",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, password }),
+            body: JSON.stringify({ fullname: name, email, password }),
           }
         );
         const data = await res.json();
@@ -74,56 +116,54 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
           return;
         }
 
-        // ✅ Thành công: hiện màn “Done” rồi chuyển sang /login
+        // Thành công: chuyển sang bước DONE
         setStep("done");
-        setTimeout(() => router.push("/login"), 1500);
         return;
       }
 
-      // 🔹 Login qua NextAuth
-      // 🔹 Đăng nhập qua NextAuth
+      // Đăng nhập qua NextAuth credentials
       const res = await signIn("credentials", {
         redirect: false,
         email,
         password,
       });
-      console.log("🔍 Kết quả đăng nhập:", res);
 
       if (res?.error) {
         alert("Sai email hoặc mật khẩu!");
         return;
       }
 
-      // ✅ Đăng nhập thành công → NextAuth tự lưu JWT session
-      router.push("/");
-
-      // ✅ Đăng nhập xong → về trang chủ
-      router.push("/");
+      // Đăng nhập thành công
+      router.push("/"); // về trang chủ (nếu đang ở route khác)
+      onClose?.(); // đóng popup nếu có
     } catch (err) {
       console.error(err);
+      alert("Có lỗi xảy ra, vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
   }
 
+  const isRegister = mode === "register";
+
   return (
     <div className="mx-auto w-full max-w-md">
-      <div className="rounded-3xl bg-white/80 backdrop-blur border border-slate-200 shadow-[0_10px_30px_rgba(2,6,23,0.08)]">
+      <div className="rounded-3xl bg-white/90 backdrop-blur border border-slate-200 shadow-[0_18px_45px_rgba(15,23,42,0.22)] overflow-hidden">
         {/* Header */}
-        <div className="px-8 pt-8 text-center">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+        <div className="px-8 pt-7 pb-3 text-center border-b border-slate-100 bg-gradient-to-r from-[#0a56c5]/5 via-sky-50 to-emerald-50">
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">
             {title}
           </h1>
-          <p className="mt-2 text-sm text-slate-500">{desc}</p>
+          <p className="mt-2 text-xs sm:text-sm text-slate-500">{desc}</p>
         </div>
 
-        {/* Tabs */}
-        <div className="mt-6 px-8">
-          <div className="grid grid-cols-2 rounded-xl border bg-slate-50 p-1 text-sm">
+        {/* Tabs: Phone / Email */}
+        <div className="mt-5 px-8">
+          <div className="grid grid-cols-2 rounded-xl border border-slate-100 bg-slate-50 p-1 text-sm">
             <button
               className={`rounded-lg py-2 transition ${
                 method === "phone"
-                  ? "bg-white shadow font-medium"
+                  ? "bg-white shadow-sm font-medium text-slate-900"
                   : "hover:text-slate-900 text-slate-600"
               }`}
               onClick={() => setMethod("phone")}
@@ -134,7 +174,7 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
             <button
               className={`rounded-lg py-2 transition ${
                 method === "email"
-                  ? "bg-white shadow font-medium"
+                  ? "bg-white shadow-sm font-medium text-slate-900"
                   : "hover:text-slate-900 text-slate-600"
               }`}
               onClick={() => setMethod("email")}
@@ -145,78 +185,94 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
           </div>
         </div>
 
-        <div className="px-8 pb-8">
-          {/* PHONE FLOW (demo) */}
+        <div className="px-8 pb-7">
+          {/* ==== FLOW SỐ ĐIỆN THOẠI + OTP (DEMO) ==== */}
           {method === "phone" && step !== "done" && (
             <div className="pt-6 space-y-4">
               {step === "phone" && (
                 <>
-                  <label className="text-sm font-medium" htmlFor="phone">
+                  <label
+                    className="text-sm font-medium text-slate-800"
+                    htmlFor="phone"
+                  >
                     Số điện thoại
                   </label>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 rounded-xl border px-3 py-2 bg-white focus-within:ring-4 focus-within:ring-blue-100">
                     <Phone className="w-4 h-4 text-slate-500" />
                     <input
                       id="phone"
-                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-4 ring-blue-100"
+                      className="w-full border-none outline-none text-sm bg-transparent"
                       placeholder="VD: 0912345678"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                     />
                   </div>
                   <button
-                    className="mt-2 w-full rounded-xl bg-blue-700 px-4 py-2.5 text-white hover:bg-blue-800 transition"
-                    onClick={handleContinue}
+                    className="mt-2 w-full rounded-xl bg-[#0a56c5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition"
+                    onClick={handleContinuePhone}
                     type="button"
                   >
                     Tiếp tục
                   </button>
+                  <p className="text-[11px] text-slate-500">
+                    Chúng tôi sẽ gửi mã OTP về số điện thoại để{" "}
+                    {mode === "login" ? "đăng nhập" : "đăng ký"} nhanh, không
+                    cần mật khẩu.
+                  </p>
                 </>
               )}
 
               {step === "otp" && (
                 <>
-                  <label className="text-sm font-medium" htmlFor="otp">
+                  <label
+                    className="text-sm font-medium text-slate-800"
+                    htmlFor="otp"
+                  >
                     Nhập mã OTP
                   </label>
                   <input
                     id="otp"
-                    className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-4 ring-blue-100"
-                    placeholder="000000"
+                    className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-4 ring-blue-100 text-center tracking-[0.4em] text-lg"
+                    placeholder="••••••"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                   />
                   <button
-                    className="mt-2 w-full rounded-xl bg-blue-700 px-4 py-2.5 text-white hover:bg-blue-800 transition"
-                    onClick={handleVerify}
+                    className="mt-2 w-full rounded-xl bg-[#0a56c5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition"
+                    onClick={handleVerifyOtp}
                     type="button"
                   >
-                    {mode === "login" ? "Đăng nhập" : "Đăng ký"}
+                    {mode === "login" ? "Đăng nhập" : "Đăng ký"} bằng OTP
                   </button>
-                  <p className="text-xs text-slate-500 text-center">
-                    Mã OTP đã gửi về số {phone}.{" "}
-                    <button className="underline">Gửi lại</button>
+                  <p className="text-[11px] text-slate-500 text-center mt-1">
+                    Mã OTP đã gửi về số <strong>{phone}</strong>.{" "}
+                    <button className="underline underline-offset-2">
+                      Gửi lại mã
+                    </button>
                   </p>
                 </>
               )}
             </div>
           )}
 
-          {/* EMAIL FLOW (NextAuth) */}
+          {/* ==== FLOW EMAIL (LOGIN / REGISTER) ==== */}
           {method === "email" && step !== "done" && (
             <form className="pt-6 space-y-4" onSubmit={submitEmail}>
-              {mode === "register" && (
+              {isRegister && (
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium">
+                  <label
+                    htmlFor="name"
+                    className="text-sm font-medium text-slate-800"
+                  >
                     Họ và tên
                   </label>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 rounded-xl border px-3 py-2 bg-white focus-within:ring-4 focus-within:ring-blue-100">
                     <User className="w-4 h-4 text-slate-500" />
                     <input
                       name="name"
                       id="name"
                       placeholder="Nguyễn Văn A"
-                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-4 ring-blue-100"
+                      className="w-full border-none outline-none text-sm bg-transparent"
                       required
                     />
                   </div>
@@ -225,17 +281,20 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
 
               {/* Email */}
               <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">
+                <label
+                  htmlFor="email"
+                  className="text-sm font-medium text-slate-800"
+                >
                   Email
                 </label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 rounded-xl border px-3 py-2 bg-white focus-within:ring-4 focus-within:ring-blue-100">
                   <Mail className="w-4 h-4 text-slate-500" />
                   <input
                     name="email"
                     id="email"
                     type="email"
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-4 ring-blue-100"
+                    className="w-full border-none outline-none text-sm bg-transparent"
                     required
                   />
                 </div>
@@ -243,36 +302,42 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
 
               {/* Mật khẩu */}
               <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-slate-800"
+                >
                   Mật khẩu
                 </label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 rounded-xl border px-3 py-2 bg-white focus-within:ring-4 focus-within:ring-blue-100">
                   <Lock className="w-4 h-4 text-slate-500" />
                   <input
                     name="password"
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-4 ring-blue-100"
+                    className="w-full border-none outline-none text-sm bg-transparent"
                     required
                   />
                 </div>
               </div>
 
-              {/* Xác nhận mật khẩu – chỉ với register */}
-              {mode === "register" && (
+              {/* Xác nhận mật khẩu – chỉ khi register */}
+              {isRegister && (
                 <div className="space-y-2">
-                  <label htmlFor="confirm" className="text-sm font-medium">
+                  <label
+                    htmlFor="confirm"
+                    className="text-sm font-medium text-slate-800"
+                  >
                     Xác nhận mật khẩu
                   </label>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 rounded-xl border px-3 py-2 bg-white focus-within:ring-4 focus-within:ring-blue-100">
                     <Lock className="w-4 h-4 text-slate-500" />
                     <input
                       name="confirm"
                       id="confirm"
                       type="password"
                       placeholder="••••••••"
-                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-4 ring-blue-100"
+                      className="w-full border-none outline-none text-sm bg-transparent"
                       required
                     />
                   </div>
@@ -280,45 +345,69 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
               )}
 
               <button
-                className="w-full rounded-xl bg-blue-700 px-4 py-2.5 text-white hover:bg-blue-800 transition flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full rounded-xl bg-[#0a56c5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition flex items-center justify-center gap-2 disabled:opacity-60"
                 type="submit"
                 disabled={loading}
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
               </button>
+
+              {mode === "login" && (
+                <p className="text-[11px] text-slate-500 text-center">
+                  Quên mật khẩu?{" "}
+                  <span className="underline underline-offset-2 cursor-pointer">
+                    Liên hệ dược sĩ Tâm An để được hỗ trợ.
+                  </span>
+                </p>
+              )}
             </form>
           )}
 
-          {/* DONE */}
+          {/* ==== DONE STEP (cho register & OTP demo) ==== */}
           {step === "done" && (
             <div className="flex flex-col items-center gap-3 py-10">
-              <CheckCircle2 className="w-10 h-10 text-green-600" />
-              <p className="font-medium text-lg">
+              <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+              <p className="font-medium text-lg text-slate-900">
                 {mode === "login"
-                  ? "Đăng nhập thành công"
+                  ? "Xác thực thành công"
                   : "Đăng ký thành công"}
               </p>
-              <p className="text-sm text-slate-500 text-center">
+              <p className="text-sm text-slate-500 text-center max-w-xs">
                 {mode === "login"
-                  ? "Bạn có thể tiếp tục mua sắm."
-                  : "Tài khoản đã sẵn sàng. Hãy đăng nhập để bắt đầu."}
+                  ? "Bạn có thể tiếp tục mua sắm và theo dõi đơn hàng."
+                  : "Tài khoản đã sẵn sàng. Hãy đăng nhập để bắt đầu mua sắm tại Nhà Thuốc Tâm An."}
               </p>
+
               {mode === "register" && (
-                <Link
-                  href="/login"
-                  className="mt-2 inline-flex items-center justify-center rounded-xl bg-blue-700 px-4 py-2.5 text-white hover:bg-blue-800 transition"
+                <button
+                  onClick={() => {
+                    onSwitchMode?.("login");
+                    setStep("phone");
+                    setMethod("email");
+                  }}
+                  className="mt-1 inline-flex items-center justify-center rounded-xl bg-[#0a56c5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition"
                 >
                   Đăng nhập ngay
-                </Link>
+                </button>
               )}
+
+              <button
+                onClick={() => {
+                  onClose?.();
+                  router.push("/");
+                }}
+                className="text-xs text-slate-500 underline underline-offset-2 mt-1"
+              >
+                Đóng và quay về trang chủ
+              </button>
             </div>
           )}
 
-          {/* Divider + Social */}
+          {/* Divider + Social (trừ khi đang ở step DONE) */}
           {step !== "done" && (
             <>
-              <div className="my-6 relative">
+              <div className="my-5 relative">
                 <div className="h-px bg-slate-200" />
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-3 text-[11px] text-slate-500">
                   Hoặc tiếp tục bằng
@@ -326,7 +415,7 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <button
-                  className="w-full rounded-xl border px-3 py-2 hover:bg-slate-50 transition"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 hover:bg-slate-50 transition text-slate-700 text-xs"
                   type="button"
                 >
                   {/* Google icon inline */}
@@ -350,7 +439,7 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
                   </svg>
                 </button>
                 <button
-                  className="w-full rounded-xl border px-3 py-2 hover:bg-slate-50 transition"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 hover:bg-slate-50 transition"
                   type="button"
                   aria-label="Facebook"
                 >
@@ -362,7 +451,7 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
                   </svg>
                 </button>
                 <button
-                  className="w-full rounded-xl border px-3 py-2 hover:bg-slate-50 transition"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 hover:bg-slate-50 transition flex items-center justify-center"
                   type="button"
                 >
                   <Apple className="w-5 h-5" />
@@ -371,6 +460,19 @@ export default function AuthCard({ mode = "login" }: { mode?: AuthCardMode }) {
             </>
           )}
         </div>
+      </div>
+
+      {/* Link fallback để SEO / deep-link, giống Long Châu thường có ở chân popup */}
+      <div className="mt-3 text-center text-[11px] text-slate-400">
+        Bạn cũng có thể truy cập trực tiếp{" "}
+        <Link href="/login" className="underline underline-offset-2">
+          trang đăng nhập
+        </Link>{" "}
+        hoặc{" "}
+        <Link href="/register" className="underline underline-offset-2">
+          trang đăng ký
+        </Link>
+        .
       </div>
     </div>
   );
