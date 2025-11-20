@@ -23,22 +23,24 @@ export default async function AdminLayout({
   if (session.user.role !== "admin") redirect("/");
 
   return (
-    <div className="admin-shell min-h-screen flex overflow-hidden text-gray-800 bg-gray-50">
+    <div className="admin-shell min-h-screen flex text-gray-800 bg-[#f3f4f6]">
       <AdminBodyClass />
 
-      {/* ✅ Sidebar mới có collapse + active */}
+      {/* Sidebar */}
       <Sidebar />
 
-      {/* ✅ Main content */}
-      <main
-        className="flex-1 min-h-screen transition-all"
-        style={{ marginLeft: "var(--sb-w,16rem)" }}
-      >
-        {/* ✅ Header mới có logout + toast */}
+          {/* ✅ Main content full width */}
+      <main className="admin-main flex-1 flex flex-col transition-all">
+        {/* Header cố định trên cùng */}
         <AdminHeader userName={session.user.name ?? "Admin"} />
 
-        <div className="p-6">{children}</div>
+        {/* Vùng nội dung chính */}
+        <div className="flex-1 px-6 pb-8 pt-4">
+          {/* KHÔNG giới hạn max-w nữa → ăn full chiều ngang */}
+          <div className="space-y-6 h-full">{children}</div>
+        </div>
       </main>
     </div>
   );
 }
+

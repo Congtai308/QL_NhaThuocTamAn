@@ -37,7 +37,11 @@ body.longchau-bg {
   pointer-events: none;
   z-index: 0;
 }
-
+/* ❌ Tắt hẳn ánh sáng trắng phía trên cho trang admin */
+body.admin-page .bg-longchau main::before,
+body.admin-bg .bg-longchau main::before {
+  content: none !important;
+}
 
 /* 🧱 Nền trắng xám nhẹ cho trang admin hoặc employee */
 body.admin-bg {
@@ -86,8 +90,17 @@ body.admin-bg.longchau-bg {
 }
 /* === ADMIN LAYOUT ONLY === */
 :root { --sb-w: 16rem; }              /* mặc định sidebar rộng 64 */
-.admin-main { margin-left: var(--sb-w); background: #f5f7fa; min-height: 100vh; }
+/* .admin-main { margin-left: var(--sb-w); background: #f5f7fa; min-height: 100vh; } */
+.admin-main {
+  margin-left: var(--sb-w);
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
 /* Khi mobile ẩn sidebar, bạn có thể toggle body.sidebar-open nếu muốn mở rộng/thu gọn */
 @media (max-width: 1024px) {
   body:not(.sidebar-open) .admin-main { margin-left: 5rem; } /* khớp w-20 */
+}
+.admin-card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-100;
 }
