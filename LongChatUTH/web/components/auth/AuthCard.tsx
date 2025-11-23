@@ -102,7 +102,7 @@ export default function AuthCard({
 
         // Gọi API PHP để đăng ký
         const res = await fetch(
-          "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/register.php",
+          "/api/php?path=register",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
