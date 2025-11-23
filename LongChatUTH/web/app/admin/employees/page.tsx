@@ -11,8 +11,7 @@ type Employee = {
   title: string;
 };
 
-const API =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/employees.php";
+const API = "/api/php?path=employees";
 
 const initialForm = { full_name: "", phone: "", email: "", title: "" };
 

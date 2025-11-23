@@ -12,7 +12,7 @@ type Supplier = {
 };
 
 const API =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/suppliers.php";
+  "/api/php?path=suppliers";
 
 const initialForm: Omit<Supplier, "supplier_id"> = {
   name: "",

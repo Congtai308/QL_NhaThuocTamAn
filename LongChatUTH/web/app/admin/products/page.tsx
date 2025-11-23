@@ -23,9 +23,9 @@ type FormState = {
 type Category = { id: string | number; name: string };
 
 const API =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/products.php";
+  "/api/php?path=products";
 const CAT_API =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/categories.php";
+  "/api/php?path=categories";
 
 const initialForm: FormState = {
   name: "",

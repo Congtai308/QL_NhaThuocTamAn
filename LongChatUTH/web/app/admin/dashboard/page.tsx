@@ -25,14 +25,10 @@ ChartJS.register(
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
-const PRODUCT_API =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/products.php";
-const ORDER_API =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
-const EMP_API =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/employees.php";
-const SUP_API =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/suppliers.php";
+const PRODUCT_API = "/api/php?path=products";
+const ORDER_API = "/api/php?path=orders";
+const EMP_API = "/api/php?path=employees";
+const SUP_API = "/api/php?path=suppliers";
 
 type Product = {
   id: number;

@@ -23,7 +23,7 @@ type OrderItem = {
   unit_price: number;
 };
 
-const API = "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
+const API = "/api/php?path=orders";
 
 export default function MyOrdersPage() {
   const searchParams = useSearchParams();

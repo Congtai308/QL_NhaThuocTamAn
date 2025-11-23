@@ -225,7 +225,7 @@ export default function CartPage() {
   
     try {
       const res = await fetch(
-        "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/orders.php",
+        "/api/php?path=orders",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

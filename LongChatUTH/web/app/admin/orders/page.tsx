@@ -23,7 +23,7 @@ type OrderForm = {
 };
 
 const ORDER_API =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
+  "/api/php?path=orders";
 
 const emptyForm: OrderForm = {
   order_code: "",
