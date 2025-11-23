@@ -12,7 +12,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         try {
           const res = await fetch(
-            "http://nhom37.itimit.id.vn/LongChatUTH/api/login.php",
+            "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/login.php",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

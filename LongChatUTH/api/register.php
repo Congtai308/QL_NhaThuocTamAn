@@ -11,10 +11,10 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 
 // ✅ Kết nối DB
 $servername = "127.0.0.1";
-$username = "root";
-$password = "";
-$dbname = "nhathuoctaman";
-$port = "4306";
+$username = "sql_nhom37_itimi";
+$password = "22f35426abc4d8";
+$dbname = "sql_nhom37_itimi";
+$port = "3306";
 
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 if ($conn->connect_error) {

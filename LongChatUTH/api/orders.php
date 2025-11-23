@@ -12,97 +12,101 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 }
 
 $method = $_SERVER["REQUEST_METHOD"];
-$db = new mysqli("127.0.0.1", "root", "", "nhathuoctaman", 4306);
-if ($db->connect_error) {
-  http_response_code(500);
-  echo json_encode(["error" => "Kết nối DB thất bại"]);
+
+// Bật exception để dễ debug SQL
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+// Kết nối DB
+$db = new mysqli("127.0.0.1", "sql_nhom37_itimi", "22f35426abc4d8", "sql_nhom37_itimi", 3306);
+if ($db->connect_errno) {
+  echo json_encode(["error" => "Kết nối DB thất bại", "message" => $db->connect_error]);
   exit;
 }
 $db->set_charset("utf8mb4");
 
-// ===================================================
-// 1. TẠO ĐƠN HÀNG (CHECKOUT)
-// ===================================================
-if ($method === "POST" && !isset($_GET["id"])) {
-  $body = json_decode(file_get_contents("php://input"), true);
 
-  if (!$body || !isset($body["items"]) || !is_array($body["items"])) {
-    http_response_code(400);
+// ====================================================================
+// 1. TẠO ĐƠN HÀNG
+// ====================================================================
+if ($method === "POST" && !isset($_GET["id"])) {
+
+  $body = json_decode(file_get_contents("php://input"), true);
+  if (!$body || !is_array($body["items"] ?? null)) {
     echo json_encode(["error" => "Dữ liệu không hợp lệ"]);
     exit;
   }
 
-  $shipName      = trim($body["shipping_name"] ?? "");
-  $shipPhone     = trim($body["shipping_phone"] ?? "");
-  $shipAddress   = trim($body["shipping_address"] ?? "");
-  $billName      = trim($body["billing_name"] ?? $shipName);
-  $billPhone     = trim($body["billing_phone"] ?? $shipPhone);
-  $billAddress   = trim($body["billing_address"] ?? $shipAddress);
-  $items         = $body["items"]; // [{ id, qty }...]
-  $paymentMethod = $body["payment_method"] ?? "cod";  // cod | vnpay
-  $bankCodeBody  = $body["bank_code"] ?? "";          // VNPAYQR | VNBANK | INTCARD | ...
+  $shipName    = trim($body["shipping_name"] ?? "");
+  $shipPhone   = trim($body["shipping_phone"] ?? "");
+  $shipAddress = trim($body["shipping_address"] ?? "");
+
+  $billName    = trim($body["billing_name"] ?? $shipName);
+  $billPhone   = trim($body["billing_phone"] ?? $shipPhone);
+  $billAddress = trim($body["billing_address"] ?? $shipAddress);
+
+  $items       = $body["items"];
+  $paymentMethod = $body["payment_method"] ?? "cod";
+  $bankCodeBody  = $body["bank_code"] ?? "";
 
   if ($shipName === "" || $shipPhone === "") {
-    http_response_code(400);
-    echo json_encode(["error" => "Vui lòng nhập tên và số điện thoại"]);
+    echo json_encode(["error" => "Vui lòng nhập tên & số điện thoại"]);
     exit;
   }
 
   $totalAmount = 0;
   $orderItems  = [];
 
+  // Tính tổng tiền
   foreach ($items as $it) {
     $pid = intval($it["id"] ?? 0);
     $qty = intval($it["qty"] ?? 0);
     if ($pid <= 0 || $qty <= 0) continue;
 
-    $stmt = $db->prepare("SELECT name, price FROM products WHERE id = ?");
+    $stmt = $db->prepare("SELECT price FROM products WHERE id = ?");
     $stmt->bind_param("i", $pid);
     $stmt->execute();
-    $res = $stmt->get_result();
-    $p   = $res->fetch_assoc();
+    $p = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
     if (!$p) continue;
 
-    // Chuẩn hoá giá: lấy toàn bộ chữ số trong price
-    $rawPrice  = (string)$p["price"];
-    $digits    = preg_replace('/\D/', '', $rawPrice);
-    $unitPrice = $digits !== '' ? intval($digits) : 0;
+    // chuẩn hoá giá
+    $digits = preg_replace("/\D/", "", $p["price"]);
+    $unitPrice = intval($digits ?: 0);
 
-    $lineTotal    = $unitPrice * $qty;
+    $lineTotal = $unitPrice * $qty;
     $totalAmount += $lineTotal;
 
+    // không đưa line_total vào DB vì cột đó là GENERATED
     $orderItems[] = [
       "product_id" => $pid,
-      "unit_price" => $unitPrice,
       "quantity"   => $qty,
-      "line_total" => $lineTotal,
+      "unit_price" => $unitPrice
     ];
   }
 
   if (empty($orderItems)) {
-    http_response_code(400);
-    echo json_encode(["error" => "Không có sản phẩm hợp lệ trong giỏ"]);
+    echo json_encode(["error" => "Giỏ hàng không hợp lệ"]);
     exit;
   }
 
-  // tạo mã đơn: ORD0001...
-  $codeRes  = $db->query("SELECT COUNT(*) AS c FROM orders");
-  $countRow = $codeRes->fetch_assoc();
-  $next     = intval($countRow["c"]) + 1;
-  $orderCode = "ORD" . str_pad($next, 4, "0", STR_PAD_LEFT);
-
-  $db->begin_transaction();
   try {
-    $stmt = $db->prepare(
-      "INSERT INTO orders
+    $db->begin_transaction();
+
+    // Tạo mã đơn
+    $r = $db->query("SELECT COUNT(*) AS c FROM orders");
+    $next = ($r->fetch_assoc()["c"] ?? 0) + 1;
+    $orderCode = "ORD" . str_pad($next, 4, "0", STR_PAD_LEFT);
+
+    // Lưu orders
+    $stmt = $db->prepare("
+      INSERT INTO orders
       (cart_id, user_id, customer_id, order_code, order_date, status,
        total_amount, shipping_name, shipping_phone, shipping_address,
        billing_name, billing_phone, billing_address)
-      VALUES (NULL, NULL, NULL, ?, NOW(), 'Pending',
-              ?, ?, ?, ?, ?, ?, ?)"
-    );
+      VALUES(NULL, NULL, NULL, ?, NOW(), 'Pending',
+             ?, ?, ?, ?, ?, ?, ?)
+    ");
     $stmt->bind_param(
       "sissssss",
       $orderCode,
@@ -118,19 +122,19 @@ if ($method === "POST" && !isset($_GET["id"])) {
     $orderId = $stmt->insert_id;
     $stmt->close();
 
-    $stmtItem = $db->prepare(
-      "INSERT INTO order_items (order_id, product_id, quantity, unit_price, line_total)
-       VALUES (?, ?, ?, ?, ?)"
-    );
+    // Lưu order_items (KHÔNG có line_total)
+    $stmtItem = $db->prepare("
+      INSERT INTO order_items (order_id, product_id, quantity, unit_price)
+      VALUES (?, ?, ?, ?)
+    ");
 
     foreach ($orderItems as $oi) {
       $stmtItem->bind_param(
-        "iiiii",
+        "iiii",
         $orderId,
         $oi["product_id"],
         $oi["quantity"],
-        $oi["unit_price"],
-        $oi["line_total"]
+        $oi["unit_price"]
       );
       $stmtItem->execute();
     }
@@ -138,66 +142,22 @@ if ($method === "POST" && !isset($_GET["id"])) {
 
     $db->commit();
 
-    // ---------- Response mặc định ----------
-    $response = [
-      "success"      => true,
-      "order_id"     => $orderId,
-      "order_code"   => $orderCode,
-      "total_amount" => $totalAmount,
-    ];
-
-    // ---------- Nếu chọn thanh toán VNPAY thì tạo payment_url ----------
-    if ($paymentMethod === "vnpay") {
-
-      $vnp_TxnRef    = $orderCode;                          // mã đơn unique
-      $vnp_OrderInfo = "Thanh toán đơn hàng " . $orderCode;
-      $vnp_Amount    = $totalAmount * 100;                  // vnpay yêu cầu *100
-      $vnp_IpAddr    = $_SERVER["REMOTE_ADDR"] ?? "127.0.0.1";
-
-      $inputData = [
-        "vnp_Version"    => "2.1.0",
-        "vnp_TmnCode"    => VNP_TMN_CODE,
-        "vnp_Amount"     => $vnp_Amount,
-        "vnp_Command"    => "pay",
-        "vnp_CreateDate" => date("YmdHis"),
-        "vnp_CurrCode"   => "VND",
-        "vnp_IpAddr"     => $vnp_IpAddr,
-        "vnp_Locale"     => "vn",
-        "vnp_OrderInfo"  => $vnp_OrderInfo,
-        "vnp_OrderType"  => "other",
-        "vnp_ReturnUrl"  => VNP_RETURNURL,
-        "vnp_TxnRef"     => $vnp_TxnRef,
-      ];
-
-      // BankCode từ FE (ví dụ: VNPAYQR, VNBANK, INTCARD, v.v...)
-      if (!empty($bankCodeBody)) {
-        $inputData["vnp_BankCode"] = $bankCodeBody;
-      }
-
-      ksort($inputData);
-      $query    = "";
-      $hashData = "";
-      foreach ($inputData as $key => $value) {
-        $query    .= urlencode($key) . "=" . urlencode($value) . "&";
-        $hashData .= $key . "=" . $value . "&";
-      }
-      $query    = rtrim($query, "&");
-      $hashData = rtrim($hashData, "&");
-
-      $vnp_Url       = VNP_URL . "?" . $query;
-      $vnp_SecureHash = hash_hmac("sha512", $hashData, VNP_HASH_SECRET);
-      $vnp_Url      .= "&vnp_SecureHash=" . $vnp_SecureHash;
-
-      $response["payment_url"] = $vnp_Url;
-    }
-
-    echo json_encode($response);
-
-  } catch (Exception $e) {
-    $db->rollback();
-    http_response_code(500);
-    echo json_encode(["error" => "Lỗi lưu đơn hàng"]);
+    echo json_encode([
+      "success" => true,
+      "order_id" => $orderId,
+      "order_code" => $orderCode,
+      "total_amount" => $totalAmount
+    ]);
   }
+
+  catch (Throwable $e) {
+    $db->rollback();
+    echo json_encode([
+      "error" => "Lỗi lưu đơn hàng",
+      "message" => $e->getMessage()
+    ]);
+  }
+
   exit;
 }
 
@@ -229,7 +189,7 @@ if ($method === "POST" && isset($_GET["id"])) {
 }
 
 // ===================================================
-// 3. LẤY DANH SÁCH + CHI TIẾT
+// 3. LẤY DANH SÁCH + CHI TIẾT ĐƠN
 // ===================================================
 if ($method === "GET") {
   // Chi tiết đơn
@@ -278,8 +238,8 @@ if ($method === "GET") {
 
   if ($q !== "") {
     $safe = $db->real_escape_string($q);
-    $where .= " AND (order_code LIKE '%$safe%' 
-               OR shipping_name LIKE '%$safe%' 
+    $where .= " AND (order_code LIKE '%$safe%'
+               OR shipping_name LIKE '%$safe%'
                OR shipping_phone LIKE '%$safe%')";
   }
 

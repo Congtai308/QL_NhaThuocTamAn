@@ -13,10 +13,10 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 
 // ===== Cấu hình kết nối MySQL =====
 $servername = "127.0.0.1";
-$username = "root";
-$password = "";
-$dbname = "nhathuoctaman";
-$port = "4306";
+$username = "sql_nhom37_itimi";
+$password = "22f35426abc4d8";
+$dbname = "sql_nhom37_itimi";
+$port = "3306";
 
 // Ẩn toàn bộ warning PHP (tránh phá JSON)
 error_reporting(0);

@@ -1,6 +1,6 @@
 <?php
 // Thông tin kết nối MySQL
-$host = "localhost";      // tên server (thường là localhost)
+$host = "127.0.0.1";      // tên server (thường là localhost)
 $db_name = "sql_nhom37_itimi"; // tên database bạn đã tạo
 $username = "sql_nhom37_itimi";        // user MySQL (mặc định thường là root)
 $password = "22f35426abc4d8";            // mật khẩu MySQL (nếu có thì điền vào)
