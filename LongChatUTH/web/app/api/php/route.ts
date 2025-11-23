@@ -3,51 +3,41 @@ import { NextRequest, NextResponse } from "next/server";
 const BACKEND_BASE =
   "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api";
 
-// Hàm dùng chung cho mọi method
 async function handleProxy(req: NextRequest) {
-  const { search } = new URL(req.url); // ?path=...&page=...
+  const { search } = new URL(req.url); 
   const backendUrl = `${BACKEND_BASE}/index.php${search}`;
 
-  // Chuẩn bị options để forward
-  const init: RequestInit = {
-    method: req.method,
-    headers: {},
-  };
+  const init: RequestInit = { method: req.method, headers: {} };
 
-  // Copy Content-Type nếu có
-  const contentType = req.headers.get("content-type") || undefined;
-  if (contentType) {
-    (init.headers as any)["content-type"] = contentType;
-  }
-
-  // Với GET/HEAD không có body
-  if (req.method !== "GET" && req.method !== "HEAD") {
-    const body = await req.arrayBuffer();
-    init.body = body as any;
+  // Nếu là POST && JSON thì convert sang form-data cho PHP
+  if (req.method === "POST") {
+    const contentType = req.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const json = await req.json();
+      const form = new URLSearchParams();
+      for (const k in json) {
+        form.append(k, json[k]);
+      }
+      init.body = form.toString();
+      (init.headers as any)["Content-Type"] =
+        "application/x-www-form-urlencoded";
+    } else {
+      const body = await req.arrayBuffer();
+      init.body = body as any;
+      if (contentType) (init.headers as any)["Content-Type"] = contentType;
+    }
   }
 
   const res = await fetch(backendUrl, init);
-
   const text = await res.text();
-  const resContentType = res.headers.get("content-type") || "application/json";
 
   return new NextResponse(text, {
     status: res.status,
-    headers: {
-      "content-type": resContentType,
-    },
+    headers: { "Content-Type": res.headers.get("Content-Type") || "application/json" },
   });
 }
 
-export async function GET(req: NextRequest) {
-  return handleProxy(req);
-}
-export async function POST(req: NextRequest) {
-  return handleProxy(req);
-}
-export async function PUT(req: NextRequest) {
-  return handleProxy(req);
-}
-export async function DELETE(req: NextRequest) {
-  return handleProxy(req);
-}
+export async function GET(req: NextRequest) { return handleProxy(req); }
+export async function POST(req: NextRequest) { return handleProxy(req); }
+export async function PUT(req: NextRequest) { return handleProxy(req); }
+export async function DELETE(req: NextRequest) { return handleProxy(req); }
