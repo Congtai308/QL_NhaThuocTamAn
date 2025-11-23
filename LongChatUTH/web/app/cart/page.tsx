@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart, money } from "@/lib/cart";
-
+import { useRouter } from "next/navigation";
 /* Inline icons (không phụ thuộc lib) */
 const paymentOptions = [
   {
@@ -74,6 +74,7 @@ function QtyPill({
 
 export default function CartPage() {
   const { items, setQty, remove, clear } = useCart();
+  const router = useRouter();
   const [method, setMethod] = useState<"delivery" | "pickup">("delivery");
   const [payment, setPayment] = useState(paymentOptions[0].id);
   const [invoice, setInvoice] = useState(false);
@@ -104,7 +105,7 @@ export default function CartPage() {
     const fetchProvinces = async () => {
       try {
         const res = await fetch(
-          "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/locations.php?type=province"
+          "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/locations.php?type=province"
         );
         if (!res.ok) throw new Error("Status " + res.status);
         const data = await res.json();
@@ -141,7 +142,7 @@ export default function CartPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/locations.php?type=district&province_id=${id}`
+        `http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/locations.php?type=district&province_id=${id}`
       );
       if (!res.ok) throw new Error("Status " + res.status);
       const data = await res.json();
@@ -162,7 +163,7 @@ export default function CartPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/locations.php?type=ward&district_id=${id}`
+        `http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/locations.php?type=ward&district_id=${id}`
       );
       if (!res.ok) throw new Error("Status " + res.status);
       const data = await res.json();
@@ -171,13 +172,12 @@ export default function CartPage() {
       console.error("Lỗi load phường/xã:", err);
     }
   };
-
   const handleCheckout = async () => {
     if (items.length === 0) {
       alert("Giỏ hàng đang trống");
       return;
     }
-
+  
     if (method === "delivery") {
       if (!customerName.trim() || !phone.trim()) {
         alert("Vui lòng nhập Họ tên và Số điện thoại");
@@ -188,13 +188,14 @@ export default function CartPage() {
         return;
       }
     }
-
+  
     const provinceName =
       provinces.find((p) => p.province_id === provinceId)?.province_name || "";
     const districtName =
       districts.find((d) => d.district_id === districtId)?.district_name || "";
-    const wardName = wards.find((w) => w.ward_id === wardId)?.ward_name || "";
-
+    const wardName =
+      wards.find((w) => w.ward_id === wardId)?.ward_name || "";
+  
     const fullAddress =
       method === "delivery"
         ? `${addressDetail}, ${wardName}, ${districtName}, ${provinceName}`.replace(
@@ -202,9 +203,11 @@ export default function CartPage() {
             ""
           )
         : "Nhận tại nhà thuốc";
-
-    const selectedPayment = paymentOptions.find((opt) => opt.id === payment);
-
+  
+    const selectedPayment = paymentOptions.find(
+      (opt) => opt.id === payment
+    );
+  
     const payload = {
       shipping_name: customerName || "Khách lẻ",
       shipping_phone: phone || "0000000000",
@@ -219,10 +222,10 @@ export default function CartPage() {
       payment_method: selectedPayment?.payment_method ?? "cod",
       bank_code: selectedPayment?.bank_code || undefined,
     };
-
+  
     try {
       const res = await fetch(
-        "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/orders.php",
+        "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/orders.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -230,25 +233,45 @@ export default function CartPage() {
         }
       );
       const data = await res.json();
-
+  
       if (!data.success) {
         alert(data.error || "Đặt hàng thất bại");
         return;
       }
-
+  
+      // Nếu là thanh toán online, server trả về payment_url thì cho user sang cổng thanh toán
       if (data.payment_url) {
         window.location.href = data.payment_url;
         return;
       }
-
+  
+      // Đặt hàng COD thành công
       alert("Đặt hàng thành công! Mã đơn: " + data.order_code);
+  
+      // Xoá giỏ hàng
       clear();
+  
+      // Lưu tạm số điện thoại để lần sau tự fill (optional)
+      try {
+        if (phone) {
+          localStorage.setItem("order_phone", phone);
+        }
+      } catch {
+        // ignore
+      }
+  
+      // Redirect sang trang tra cứu đơn hàng: /orders?phone=...&code=...
+      const qs = new URLSearchParams();
+      if (phone) qs.set("phone", phone);
+      if (data.order_code) qs.set("code", data.order_code);
+  
+      router.push(`/orders?${qs.toString()}`);
     } catch (err) {
       console.error(err);
       alert("Có lỗi khi kết nối server");
     }
   };
-
+  
   const totalItems = useMemo(
     () => items.reduce((sum, i) => sum + i.qty, 0),
     [items]

@@ -1,9 +1,9 @@
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
-  "http://localhost:9000/LongChatUTH/api/index.php";
+  "http://nhom37.itimit.id.vn/LongChatUTH/api/index.php";
 
 export const IMAGE_BASE =
-  process.env.NEXT_PUBLIC_IMAGE_BASE || "http://localhost:9000/LongChatUTH/";
+  process.env.NEXT_PUBLIC_IMAGE_BASE || "http://nhom37.itimit.id.vn/LongChatUTH/";
 
 export function imageUrl(p?: string) {
   if (!p) return "";

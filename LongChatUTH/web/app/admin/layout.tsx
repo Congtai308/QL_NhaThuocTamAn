@@ -19,8 +19,12 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/login");
-  if (session.user.role !== "admin") redirect("/");
+if (!session) redirect("/login");
+
+// Ép kiểu cho TypeScript, runtime vẫn dùng field role bình thường
+const role = (session.user as any)?.role;
+
+if (role !== "admin") redirect("/");
 
   return (
     <div className="admin-shell min-h-screen flex text-gray-800 bg-[#f3f4f6]">

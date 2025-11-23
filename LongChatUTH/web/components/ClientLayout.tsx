@@ -2,7 +2,7 @@
 
 import Header from "@/components/Header";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ClientLayout({
@@ -13,22 +13,21 @@ export default function ClientLayout({
   const pathname = usePathname();
   const [fade, setFade] = useState(false);
 
-  // 👇 Các trang admin / employee: dùng layout riêng, KHÔNG qua ClientLayout
+  // Trang admin / employee không dùng layout này
   const isAdminPage =
     pathname?.startsWith("/admin") || pathname?.startsWith("/employee");
 
   if (isAdminPage) {
-    // Không header user, không max-width, không hiệu ứng gì hết
     return <>{children}</>;
   }
 
-  // 👇 Các trang user bình thường
+  // Trang user
   const isPlainPage =
     pathname?.startsWith("/products/") ||
     pathname?.startsWith("/cart") ||
     pathname?.startsWith("/checkout");
 
-  // Hiệu ứng fade khi chuyển trang
+  // Hiệu ứng fade khi đổi trang
   useEffect(() => {
     setFade(true);
     const timer = setTimeout(() => setFade(false), 300);
@@ -43,18 +42,26 @@ export default function ClientLayout({
     >
       <Header />
 
-      {/* slide-up khi đổi trang */}
+      {/* 🔥 FIX: Bọc trong Suspense để Next không lỗi khi prerender */}
       <AnimatePresence mode="wait">
-        <motion.main
-          key={pathname}
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="max-w-6xl mx-auto px-4 py-6"
+        <Suspense
+          fallback={
+            <main className="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-500">
+              Đang tải...
+            </main>
+          }
         >
-          {children}
-        </motion.main>
+          <motion.main
+            key={pathname}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="max-w-6xl mx-auto px-4 py-6"
+          >
+            {children}
+          </motion.main>
+        </Suspense>
       </AnimatePresence>
     </div>
   );

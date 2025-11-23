@@ -23,7 +23,7 @@ type OrderForm = {
 };
 
 const ORDER_API =
-  "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
+  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
 
 const emptyForm: OrderForm = {
   order_code: "",
@@ -33,6 +33,9 @@ const emptyForm: OrderForm = {
   shipping_name: "",
   phone: "",
 };
+
+const formatMoney = (n: number) =>
+  n.toLocaleString("vi-VN", { maximumFractionDigits: 0 }) + "₫";
 
 export default function AdminOrders() {
   const [items, setItems] = useState<Order[]>([]);
@@ -65,9 +68,6 @@ export default function AdminOrders() {
     fetchOrders();
   }, []);
 
-  const formatMoney = (n: number) =>
-    n.toLocaleString("vi-VN", { maximumFractionDigits: 0 }) + "₫";
-
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return items.filter((o) => {
@@ -82,6 +82,18 @@ export default function AdminOrders() {
       return matchesQ && matchesStatus;
     });
   }, [items, q, statusFilter]);
+
+  const totalOrders = items.length;
+  const totalRevenue = items.reduce(
+    (s, o) => s + Number(o.total_amount || 0),
+    0
+  );
+  const pendingOrders = items.filter((o) =>
+    (o.status || "").toLowerCase().includes("pending")
+  ).length;
+  const completedOrders = items.filter((o) =>
+    (o.status || "").toLowerCase().includes("completed")
+  ).length;
 
   // ===== handlers =====
   const openAddModal = () => {
@@ -109,6 +121,7 @@ export default function AdminOrders() {
     e.preventDefault();
 
     if (!form.order_code) return toast.error("Vui lòng nhập mã đơn!");
+
     const fd = new FormData();
     fd.append("order_code", form.order_code);
     fd.append("order_date", form.order_date || "");
@@ -117,9 +130,7 @@ export default function AdminOrders() {
     fd.append("shipping_name", form.shipping_name || "");
     fd.append("phone", form.phone || "");
 
-    const url = editing
-      ? `${ORDER_API}?id=${editing.order_id}`
-      : ORDER_API;
+    const url = editing ? `${ORDER_API}?id=${editing.order_id}` : ORDER_API;
 
     try {
       const res = await fetch(url, { method: "POST", body: fd });
@@ -152,17 +163,11 @@ export default function AdminOrders() {
     }
   };
 
-  const totalOrders = items.length;
-  const totalRevenue = items.reduce(
-    (s, o) => s + Number(o.total_amount || 0),
-    0
-  );
-
   return (
     <div className="space-y-6 w-full">
       <Toaster position="top-right" />
 
-      {/* Header */}
+      {/* HEADER VIP */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-blue-700 flex items-center gap-2">
@@ -172,16 +177,65 @@ export default function AdminOrders() {
             Quản lý đơn hàng
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Theo dõi trạng thái, khách hàng và tổng tiền đơn hàng.
+            Theo dõi trạng thái, khách hàng và tổng tiền đơn hàng theo thời gian
+            thực.
           </p>
         </div>
-        <button
-          onClick={openAddModal}
-          className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 shadow-md text-sm"
-        >
-          <span className="text-lg leading-none">＋</span>
-          Tạo đơn mới
-        </button>
+        <div className="hidden md:flex flex-col items-end text-right text-xs text-gray-500">
+          <span>Doanh thu tích lũy</span>
+          <span className="font-semibold text-lg text-blue-700">
+            {formatMoney(totalRevenue)}
+          </span>
+        </div>
+      </div>
+
+      {/* KPI CARDS */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="admin-card p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              Tổng đơn hàng
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-slate-900">
+              {totalOrders.toLocaleString("vi-VN")}
+            </p>
+          </div>
+          <span className="inline-flex h-9 px-3 items-center justify-center rounded-2xl bg-blue-50 text-xs text-blue-700">
+            + {pendingOrders} đang chờ xử lý
+          </span>
+        </div>
+
+        <div className="admin-card p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              Đơn hoàn tất
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-emerald-700">
+              {completedOrders.toLocaleString("vi-VN")}
+            </p>
+          </div>
+          <span className="inline-flex h-9 px-3 items-center justify-center rounded-2xl bg-emerald-50 text-xs text-emerald-700">
+            Tỷ lệ{" "}
+            {totalOrders
+              ? Math.round((completedOrders / totalOrders) * 100)
+              : 0}
+            %
+          </span>
+        </div>
+
+        <div className="admin-card p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              Doanh thu (₫)
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-indigo-700">
+              {formatMoney(totalRevenue)}
+            </p>
+          </div>
+          <span className="inline-flex h-9 px-3 items-center justify-center rounded-2xl bg-indigo-50 text-xs text-indigo-700">
+            Từ {totalOrders.toLocaleString("vi-VN")} đơn
+          </span>
+        </div>
       </div>
 
       {/* Info + filter */}
@@ -189,17 +243,21 @@ export default function AdminOrders() {
         <div className="flex flex-wrap items-center gap-4 justify-between">
           <div className="flex items-center gap-4 text-sm text-gray-700">
             <div>
-              <div className="text-xs text-gray-400">Tổng đơn hàng</div>
+              <div className="text-xs text-gray-400">Đơn phù hợp bộ lọc</div>
               <div className="font-semibold">
-                {totalOrders.toLocaleString("vi-VN")} đơn
+                {filtered.length.toLocaleString("vi-VN")} đơn
               </div>
             </div>
             <div>
-              <div className="text-xs text-gray-400">Doanh thu</div>
+              <div className="text-xs text-gray-400">Doanh thu hiện tại</div>
               <div className="font-semibold text-emerald-600">
                 {formatMoney(totalRevenue)}
               </div>
             </div>
+          </div>
+          <div className="hidden md:flex items-center gap-2 text-xs text-gray-400">
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+            Dữ liệu realtime từ API PHP
           </div>
         </div>
 
@@ -238,9 +296,7 @@ export default function AdminOrders() {
             Đang tải…
           </div>
         ) : filtered.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            Không có đơn hàng
-          </div>
+          <div className="p-6 text-center text-gray-500">Không có đơn hàng</div>
         ) : (
           <table className="min-w-full text-sm">
             <thead className="bg-slate-50 text-slate-600">
@@ -256,7 +312,10 @@ export default function AdminOrders() {
             </thead>
             <tbody>
               {filtered.map((o) => (
-                <tr key={o.order_id} className="border-t hover:bg-slate-50/80">
+                <tr
+                  key={o.order_id}
+                  className="border-t hover:bg-slate-50/80 transition-colors"
+                >
                   <td className="p-2 font-medium text-slate-800">
                     {o.order_code}
                   </td>
@@ -300,6 +359,7 @@ export default function AdminOrders() {
       {open && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            {/* Header modal */}
             <div className="bg-gradient-to-r from-blue-600 to-sky-500 px-6 py-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -324,6 +384,7 @@ export default function AdminOrders() {
               </button>
             </div>
 
+            {/* Body form */}
             <form onSubmit={onSave} className="grid grid-cols-2 gap-5 p-6">
               <div>
                 <label className="text-sm font-medium text-gray-700">
@@ -374,9 +435,7 @@ export default function AdminOrders() {
                 <select
                   className="w-full mt-1 border rounded-lg p-3 text-sm bg-white"
                   value={form.status}
-                  onChange={(e) =>
-                    setForm({ ...form, status: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, status: e.target.value })}
                 >
                   <option value="Pending">Pending</option>
                   <option value="Paid">Paid</option>
@@ -406,9 +465,7 @@ export default function AdminOrders() {
                 <input
                   className="w-full mt-1 border rounded-lg p-3 text-sm"
                   value={form.phone}
-                  onChange={(e) =>
-                    setForm({ ...form, phone: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 />
               </div>
 
@@ -439,7 +496,7 @@ export default function AdminOrders() {
   );
 }
 
-// badge giống dashboard
+// Badge giống dashboard/products
 function StatusBadge({ status }: { status: string }) {
   const normalized = (status || "").toLowerCase();
   let color = "bg-slate-100 text-slate-700 border-slate-200";

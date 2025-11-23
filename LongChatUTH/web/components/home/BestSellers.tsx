@@ -11,7 +11,7 @@ export default function BestSellers() {
 
   const url = useMemo(
     () =>
-      `http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/index.php?path=products&page=${page}&limit=${limit}`,
+      `http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/index.php?path=products&page=${page}&limit=${limit}`,
     [page]
   );
 

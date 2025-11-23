@@ -14,7 +14,7 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function Brands() {
   const { data, error, isLoading } = useSWR(
-    "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/index.php?path=brands",
+    "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/index.php?path=brands",
     fetcher,
     { revalidateOnFocus: false }
   );

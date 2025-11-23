@@ -12,7 +12,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         try {
           const res = await fetch(
-            "http://localhost:9000/LongChatUTH/api/login.php",
+            "http://nhom37.itimit.id.vn/LongChatUTH/api/login.php",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -27,12 +27,13 @@ export const authOptions: NextAuthOptions = {
           console.log("✅ PHP Response:", data);
 
           if (data?.success && data.user) {
-            // ✅ Thêm role (admin / employee / user)
+            const u = data.user;
+
             return {
-              id: data.user.id,
-              name: data.user.name,
-              email: data.user.email,
-              role: data.user.role || "user", // 🟢 Mặc định user
+              id: u.id,
+              name: u.name,
+              email: u.email,
+              role: u.role || "user",
               token: data.token,
             };
           }
@@ -47,31 +48,41 @@ export const authOptions: NextAuthOptions = {
   ],
 
   session: {
-    strategy: "jwt", // ✅ Lưu session bằng JWT
+    strategy: "jwt",
   },
 
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = user.token;
-        token.user = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role, // ✅ Lưu role vào JWT
+        const u = user as any;
+
+        (token as any).accessToken = u.token;
+        (token as any).user = {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
         };
       }
       return token;
     },
 
     async session({ session, token }) {
-      session.accessToken = token.accessToken;
-      session.user = token.user; // ✅ Đưa user (kèm role) vào session
+      const t = token as any;
+
+      (session as any).accessToken = t.accessToken;
+
+      (session as any).user = {
+        ...(session.user || {}),
+        ...(t.user || {}),
+      };
+
       return session;
     },
   },
 
   secret: process.env.NEXTAUTH_SECRET || "local-dev-secret",
+
   pages: {
     signIn: "/login",
   },

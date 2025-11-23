@@ -13,7 +13,9 @@ export default async function EmployeeLayout({
 
   // ✅ Cho phép cả admin và employee
   const allowedRoles = ["admin", "employee"];
-  if (!allowedRoles.includes(session.user.role)) redirect("/");
+  const role = (session.user as any)?.role || "user";
+
+  if (!allowedRoles.includes(role)) redirect("/");
 
   return <div className="p-6 bg-gray-50 min-h-screen">{children}</div>;
 }

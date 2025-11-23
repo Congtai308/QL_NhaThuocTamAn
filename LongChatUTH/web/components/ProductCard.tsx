@@ -54,24 +54,25 @@ export default function ProductCard({ p }: { p: Product }) {
 
   const handleAdd = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault(); // chỉ chặn khi bấm nút mua, không ảnh hưởng link
+      e.preventDefault();
       e.stopPropagation();
-
-      add(
-        {
-          id: Number(p.id),
-          name: p.name,
-          price: priceNumber, // 🔴 giá đúng đưa vào cart
-          unit,
-          image: imageSrc || undefined,
-        },
-        1
-      );
-      showPeek();
+  
+      const item = {
+        id: Number(p.id),
+        name: p.name,
+        price: priceNumber,
+        unit,
+        image: imageSrc || undefined,
+        qty: 1,
+      };
+  
+      add(item, 1);
+  
+      // truyền item vào showPeek để đúng kiểu TypeScript
+      showPeek(item as any);
     },
     [add, showPeek, p.id, p.name, imageSrc, priceNumber, unit]
   );
-
   return (
     <div className="rounded-2xl border bg-white p-3 flex flex-col justify-between h-full">
       {/* Block ảnh */}

@@ -12,7 +12,7 @@ type Supplier = {
 };
 
 const API =
-  "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/suppliers.php";
+  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/suppliers.php";
 
 const initialForm: Omit<Supplier, "supplier_id"> = {
   name: "",
@@ -53,6 +53,8 @@ export default function SuppliersPage() {
       [s.name, s.address, s.phone, s.email].join(" ").toLowerCase().includes(q)
     );
   }, [items, search]);
+
+  const totalSuppliers = items.length;
 
   const resetForm = () => {
     setEditing(null);
@@ -114,10 +116,13 @@ export default function SuppliersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-blue-700 flex items-center gap-2">
-            🏭 Quản lý nhà cung cấp
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+              🏭
+            </span>
+            Quản lý nhà cung cấp
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Theo dõi các đơn vị cung ứng thuốc, thiết bị và thông tin liên hệ.
+            Theo dõi đơn vị cung ứng thuốc, thiết bị và thông tin liên hệ.
           </p>
         </div>
         <button
@@ -125,35 +130,48 @@ export default function SuppliersPage() {
             resetForm();
             setOpen(true);
           }}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-md hover:bg-blue-700"
         >
-          <span className="text-lg">➕</span> Thêm nhà cung cấp
+          <span className="text-lg">➕</span>
+          Thêm nhà cung cấp
         </button>
       </div>
 
-      {/* Filter */}
-      <div className="admin-card flex flex-wrap items-center gap-3 p-4">
-        <div className="flex-1 min-w-[240px] relative">
-          <span className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
-            🔍
-          </span>
-          <input
-            className="w-full rounded-lg border border-slate-200 bg-slate-50/60 py-2 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
-            placeholder="Tìm theo tên, địa chỉ, SĐT, email…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      {/* Filter + KPI */}
+      <div className="admin-card flex flex-col gap-3 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-4 text-sm text-slate-700">
+            <div>
+              <div className="text-xs text-slate-400">Tổng nhà cung cấp</div>
+              <div className="font-semibold">
+                {totalSuppliers.toLocaleString("vi-VN")} đơn vị
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-slate-400">Đang hiển thị</div>
+              <div className="font-semibold text-blue-600">
+                {filtered.length.toLocaleString("vi-VN")} kết quả
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="text-xs text-slate-400">
-          Tổng:{" "}
-          <span className="font-semibold text-slate-700">
-            {filtered.length}
-          </span>{" "}
-          nhà cung cấp
+
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex-1 min-w-[240px] relative">
+            <span className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
+              🔍
+            </span>
+            <input
+              className="w-full rounded-lg border border-slate-200 bg-slate-50/60 py-2 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+              placeholder="Tìm theo tên, địa chỉ, SĐT, email…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Bảng nhà cung cấp */}
       <div className="admin-card overflow-auto">
         {loading ? (
           <div className="p-6 text-center text-gray-400 animate-pulse">
@@ -214,14 +232,17 @@ export default function SuppliersPage() {
         )}
       </div>
 
-      {/* Modal add/edit */}
+      {/* Modal VIP thêm / sửa NCC */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm">
           <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl">
             <div className="bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 px-6 py-4 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-base font-semibold">
+                  <h2 className="text-base font-semibold flex items-center gap-2">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
+                      🏭
+                    </span>
                     {editing
                       ? "✏️ Sửa nhà cung cấp"
                       : "➕ Thêm nhà cung cấp mới"}

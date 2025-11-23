@@ -12,5 +12,5 @@ define("VNP_URL", "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html");
 // nhớ đổi domain khi lên thật
 define(
   "VNP_RETURNURL",
-  "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/api/vnpay_return.php"
+  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/vnpay_return.php"
 );

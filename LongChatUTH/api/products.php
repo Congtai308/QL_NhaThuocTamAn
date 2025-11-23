@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "OPTIONS") {
 }
 
 $method = $_SERVER["REQUEST_METHOD"];
-$db = new mysqli("127.0.0.1", "root", "", "nhathuoctaman", 4306);
+$db = new mysqli("localhost", "sql_nhom37_itimi", "22f35426abc4d8", "sql_nhom37_itimi", 4306);
 if ($db->connect_error) {
   http_response_code(500);
   echo json_encode(["error" => "Kết nối DB thất bại"]);
@@ -63,7 +63,7 @@ switch ($method) {
       move_uploaded_file($_FILES["image"]["tmp_name"], $target_file);
 
       // URL ảnh public (đúng với Postman bạn test)
-      $image_url = "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/uploads/" . $filename;
+      $image_url = "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/uploads/" . $filename;
     } else {
       // giữ nguyên URL cũ nếu có
       $image_url = $_POST["image"] ?? "";
@@ -91,7 +91,7 @@ switch ($method) {
       $img = $res ? ($res->fetch_assoc()["image"] ?? "") : "";
       if ($img) {
         $localPath = str_replace(
-          "http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/",
+          "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/",
           "../",
           $img
         );

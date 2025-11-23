@@ -49,8 +49,8 @@ export default function ProductModal({
       if (form.image instanceof File) formData.append("image", form.image);
 
       const url = editing
-        ? `http://localhost:9000/LongChatUTH/api/products.php?id=${editing.id}`
-        : "http://localhost:9000/LongChatUTH/api/products.php";
+        ? `http://nhom37.itimit.id.vn/LongChatUTH/api/products.php?id=${editing.id}`
+        : "http://nhom37.itimit.id.vn/LongChatUTH/api/products.php";
 
       await fetch(url, { method: "POST", body: formData });
       toast.success(
