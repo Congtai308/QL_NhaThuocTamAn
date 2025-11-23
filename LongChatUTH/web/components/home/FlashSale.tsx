@@ -10,8 +10,7 @@ export default function FlashSale() {
   const limit = 8;
 
   const url = useMemo(
-    () =>
-      `/api/index.php?path=products&page=${page}&limit=${limit}`,
+    () => `/api/php?path=products&page=${page}&limit=${limit}`,
     [page]
   );
 
