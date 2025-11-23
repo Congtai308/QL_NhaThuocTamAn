@@ -33,3 +33,6 @@ Thumbs.db
 *.log
 # Python virtual environment
 venv/
+
+echo "/node_modules" >> LongChatUTH/web/.gitignore
+echo "/.next" >> LongChatUTH/web/.gitignore
