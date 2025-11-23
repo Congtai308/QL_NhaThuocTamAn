@@ -15,7 +15,7 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function Categories() {
   const { data, error, isLoading } = useSWR(
-    "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/index.php?path=categories",
+    "/api/php?path=categories",
     fetcher,
     { revalidateOnFocus: false }
   );
