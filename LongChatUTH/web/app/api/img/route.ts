@@ -3,51 +3,74 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-// Chỉ cho phép proxy ảnh trong thư mục uploads của em
-const UPLOAD_BASE_HTTP =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/uploads/";
-
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  let src = url.searchParams.get("src");
-
-  if (!src) {
-    return new NextResponse("Missing src", { status: 400 });
-  }
-
-  // decode + normalize
-  src = decodeURIComponent(src);
-
-  // Nếu lỡ lưu https thì đổi về http để tránh lỗi SSL
-  if (src.startsWith("https://nhom37.itimit.id.vn/")) {
-    src = "http://" + src.slice("https://".length);
-  }
-
-  // Không cho proxy lung tung → tránh biến site thành open-proxy
-  if (!src.startsWith(UPLOAD_BASE_HTTP)) {
-    return new NextResponse("Invalid image source", { status: 400 });
-  }
-
   try {
-    const upstream = await fetch(src);
-
-    if (!upstream.ok) {
-      return new NextResponse("Upstream error", { status: upstream.status });
+    const urlParam = req.nextUrl.searchParams.get("url");
+    if (!urlParam) {
+      return NextResponse.json(
+        { success: false, error: "MISSING_URL" },
+        { status: 400 }
+      );
     }
 
-    const contentType = upstream.headers.get("content-type") ?? "image/jpeg";
+    // Giải mã & chuẩn hoá URL
+    let raw = decodeURIComponent(urlParam);
 
+    // Nếu còn localhost thì map sang domain thật
+    // ví dụ: http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/...
+    if (raw.includes("localhost:9000")) {
+      raw = raw.replace("http://localhost:9000", "http://nhom37.itimit.id.vn");
+    }
+
+    const u = new URL(raw);
+
+    // Chỉ cho phép http / https
+    if (u.protocol !== "http:" && u.protocol !== "https:") {
+      return NextResponse.json(
+        { success: false, error: "INVALID_PROTOCOL" },
+        { status: 400 }
+      );
+    }
+
+    // Nếu là domain của bạn mà đang https lỗi, ép về http để bypass SSL
+    if (u.hostname === "nhom37.itimit.id.vn" && u.protocol === "https:") {
+      u.protocol = "http:";
+    }
+
+    // Gọi về server nguồn lấy ảnh
+    const upstream = await fetch(u.toString());
+
+    if (!upstream.ok) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "UPSTREAM_ERROR",
+          status: upstream.status,
+        },
+        { status: 502 }
+      );
+    }
+
+    const contentType = upstream.headers.get("content-type") || "image/jpeg";
     const buffer = await upstream.arrayBuffer();
 
     return new NextResponse(buffer, {
       status: 200,
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "public, max-age=31536000, immutable",
+        // cho cache 1 ngày
+        "Cache-Control": "public, max-age=86400, immutable",
       },
     });
-  } catch (err) {
-    console.error("Proxy image error:", err);
-    return new NextResponse("Proxy error", { status: 502 });
+  } catch (err: any) {
+    console.error("Proxy /api/img error:", err);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "SERVER_ERROR",
+        message: err?.message ?? String(err),
+      },
+      { status: 500 }
+    );
   }
 }

@@ -9,7 +9,7 @@ import { useCart, money } from "@/lib/cart";
 import { useCartUi } from "@/lib/cart-ui";
 import { useCallback, useMemo } from "react";
 
-// tách giá/đơn vị nếu cần cho nút chọn mua
+// Tách giá/đơn vị nếu cần cho nút chọn mua
 function parsePrice(input?: string | number | null) {
   if (input == null) return 0;
   if (typeof input === "number") return input;
@@ -33,7 +33,7 @@ export default function ProductCard({ p }: { p: Product }) {
     [p.id]
   );
 
-  // 👉 Ưu tiên dùng cột price (number) trong DB, nếu không có thì dùng price_text cũ
+  // 👉 Ưu tiên dùng cột price (number) trong DB, nếu không có thì dùng price_text
   const rawPrice = (p as any).price ?? (p as any).price_text;
   const priceNumber = parsePrice(rawPrice);
 
@@ -47,13 +47,10 @@ export default function ProductCard({ p }: { p: Product }) {
       ? money(priceNumber)
       : "Liên hệ";
 
-  // 🔥 QUAN TRỌNG: lấy ảnh từ cột `image` của PHP
-  const imageSrc = useMemo(
-    () =>
-      imageUrl(
-        (p as any).image || (p as any).thumbnail || (p as any).image_path || ""
-      ),
-    [p]
+  // 🔥 QUAN TRỌNG: lấy ảnh từ cột `image` (PHP) / `thumbnail` / `image_path`
+  // và luôn đưa qua hàm imageUrl để dùng proxy /api/img
+  const imageSrc = imageUrl(
+    (p as any).image || (p as any).thumbnail || (p as any).image_path || ""
   );
 
   const handleAdd = useCallback(
