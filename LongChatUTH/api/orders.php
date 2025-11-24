@@ -13,27 +13,22 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 
 $method = $_SERVER["REQUEST_METHOD"];
 
-// Bật exception cho mysqli
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // Kết nối DB
 $db = new mysqli("127.0.0.1", "sql_nhom37_itimi", "22f35426abc4d8", "sql_nhom37_itimi", 3306);
 if ($db->connect_errno) {
-  echo json_encode([
-    "success" => false,
-    "error"   => "Kết nối DB thất bại",
-    "message" => $db->connect_error
-  ]);
+  echo json_encode(["success" => false, "error" => "Kết nối DB thất bại", "message" => $db->connect_error]);
   exit;
 }
 $db->set_charset("utf8mb4");
 
+
 // ====================================================================
-// 1. TẠO ĐƠN HÀNG (FE gọi: POST /api/php?path=orders)
+// 1. TẠO ĐƠN HÀNG (CLIENT / WEBSITE)
 // ====================================================================
 if ($method === "POST" && !isset($_GET["id"])) {
-
-  // Proxy Next đã convert JSON -> application/x-www-form-urlencoded
+  // FE gửi qua proxy dạng x-www-form-urlencoded
   $shipName    = trim($_POST["shipping_name"] ?? "");
   $shipPhone   = trim($_POST["shipping_phone"] ?? "");
   $shipAddress = trim($_POST["shipping_address"] ?? "");
@@ -42,9 +37,9 @@ if ($method === "POST" && !isset($_GET["id"])) {
   $billPhone   = trim($_POST["billing_phone"] ?? $shipPhone);
   $billAddress = trim($_POST["billing_address"] ?? $shipAddress);
 
-  // items được gửi lên dạng chuỗi JSON
+  // items được proxy stringify -> JSON string
   $itemsJson = $_POST["items"] ?? "";
-  $items = [];
+  $items     = [];
   if ($itemsJson !== "") {
     $decoded = json_decode($itemsJson, true);
     if (is_array($decoded)) {
@@ -82,16 +77,17 @@ if ($method === "POST" && !isset($_GET["id"])) {
 
     if (!$p) continue;
 
-    $digits = preg_replace("/\D/", "", $p["price"]);
+    // chuẩn hoá giá (loại bỏ ký tự . đ, ...)
+    $digits    = preg_replace("/\D/", "", $p["price"]);
     $unitPrice = intval($digits ?: 0);
 
-    $lineTotal = $unitPrice * $qty;
+    $lineTotal    = $unitPrice * $qty;
     $totalAmount += $lineTotal;
 
     $orderItems[] = [
       "product_id" => $pid,
       "quantity"   => $qty,
-      "unit_price" => $unitPrice,
+      "unit_price" => $unitPrice
     ];
   }
 
@@ -114,8 +110,8 @@ if ($method === "POST" && !isset($_GET["id"])) {
       (cart_id, user_id, customer_id, order_code, order_date, status,
        total_amount, shipping_name, shipping_phone, shipping_address,
        billing_name, billing_phone, billing_address)
-      VALUES (NULL, NULL, NULL, ?, NOW(), 'Pending',
-              ?, ?, ?, ?, ?, ?, ?)
+      VALUES(NULL, NULL, NULL, ?, NOW(), 'Pending',
+             ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->bind_param(
       "sissssss",
@@ -151,13 +147,12 @@ if ($method === "POST" && !isset($_GET["id"])) {
 
     $db->commit();
 
-    // Với COD: trả về luôn, không có payment_url
     echo json_encode([
       "success"      => true,
       "order_id"     => $orderId,
       "order_code"   => $orderCode,
       "total_amount" => $totalAmount,
-      "payment_url"  => null,
+      // Sau này nếu dùng VNPAY thì build thêm payment_url ở đây
     ]);
   } catch (Throwable $e) {
     $db->rollback();
@@ -171,6 +166,7 @@ if ($method === "POST" && !isset($_GET["id"])) {
 
   exit;
 }
+
 
 // ===================================================
 // 2. CẬP NHẬT TRẠNG THÁI (ADMIN)
@@ -199,10 +195,12 @@ if ($method === "POST" && isset($_GET["id"])) {
   exit;
 }
 
+
 // ===================================================
 // 3. LẤY DANH SÁCH + CHI TIẾT ĐƠN
 // ===================================================
 if ($method === "GET") {
+  // Chi tiết đơn
   if (isset($_GET["id"])) {
     $id = intval($_GET["id"]);
     if ($id <= 0) {
@@ -279,6 +277,7 @@ if ($method === "GET") {
   exit;
 }
 
+
 // ===================================================
 // 4. XOÁ ĐƠN HÀNG
 // ===================================================
@@ -306,6 +305,7 @@ if ($method === "DELETE") {
   }
   exit;
 }
+
 
 // ===================================================
 // 5. METHOD KHÁC
