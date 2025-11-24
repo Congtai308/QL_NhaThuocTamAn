@@ -43,7 +43,7 @@ if ($secureHash === $vnp_SecureHash && $vnp_ResponseCode === "00") {
 
 // URL frontend để redirect (sửa port / path nếu khác)
 $redirectFrontend =
-  "http://localhost:3000/cart?pay=" .
+  "https://nhom37itimitidvn.vercel.app/cart?pay=" .
   ($success ? "success" : "failed") .
   "&code=" . urlencode($vnp_TxnRef);
 

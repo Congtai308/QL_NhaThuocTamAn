@@ -26,30 +26,40 @@ $db->set_charset("utf8mb4");
 
 
 // ====================================================================
+// ====================================================================
 // 1. TẠO ĐƠN HÀNG
 // ====================================================================
 if ($method === "POST" && !isset($_GET["id"])) {
 
-  $body = json_decode(file_get_contents("php://input"), true);
-  if (!$body || !is_array($body["items"] ?? null)) {
-    echo json_encode(["error" => "Dữ liệu không hợp lệ"]);
+  // Lấy dữ liệu từ $_POST (proxy Next đã convert JSON -> form-urlencoded)
+  $shipName    = trim($_POST["shipping_name"] ?? "");
+  $shipPhone   = trim($_POST["shipping_phone"] ?? "");
+  $shipAddress = trim($_POST["shipping_address"] ?? "");
+
+  $billName    = trim($_POST["billing_name"] ?? $shipName);
+  $billPhone   = trim($_POST["billing_phone"] ?? $shipPhone);
+  $billAddress = trim($_POST["billing_address"] ?? $shipAddress);
+
+  // items được gửi lên dưới dạng chuỗi JSON
+  $itemsJson = $_POST["items"] ?? "";
+  $items = [];
+  if ($itemsJson !== "") {
+    $decoded = json_decode($itemsJson, true);
+    if (is_array($decoded)) {
+      $items = $decoded;
+    }
+  }
+
+  $paymentMethod = $_POST["payment_method"] ?? "cod";
+  $bankCodeBody  = $_POST["bank_code"] ?? "";
+
+  if ($shipName === "" || $shipPhone === "") {
+    echo json_encode(["success" => false, "error" => "Vui lòng nhập tên & số điện thoại"]);
     exit;
   }
 
-  $shipName    = trim($body["shipping_name"] ?? "");
-  $shipPhone   = trim($body["shipping_phone"] ?? "");
-  $shipAddress = trim($body["shipping_address"] ?? "");
-
-  $billName    = trim($body["billing_name"] ?? $shipName);
-  $billPhone   = trim($body["billing_phone"] ?? $shipPhone);
-  $billAddress = trim($body["billing_address"] ?? $shipAddress);
-
-  $items       = $body["items"];
-  $paymentMethod = $body["payment_method"] ?? "cod";
-  $bankCodeBody  = $body["bank_code"] ?? "";
-
-  if ($shipName === "" || $shipPhone === "") {
-    echo json_encode(["error" => "Vui lòng nhập tên & số điện thoại"]);
+  if (empty($items)) {
+    echo json_encode(["success" => false, "error" => "Giỏ hàng không hợp lệ"]);
     exit;
   }
 
@@ -77,7 +87,6 @@ if ($method === "POST" && !isset($_GET["id"])) {
     $lineTotal = $unitPrice * $qty;
     $totalAmount += $lineTotal;
 
-    // không đưa line_total vào DB vì cột đó là GENERATED
     $orderItems[] = [
       "product_id" => $pid,
       "quantity"   => $qty,
@@ -86,7 +95,7 @@ if ($method === "POST" && !isset($_GET["id"])) {
   }
 
   if (empty($orderItems)) {
-    echo json_encode(["error" => "Giỏ hàng không hợp lệ"]);
+    echo json_encode(["success" => false, "error" => "Giỏ hàng không hợp lệ"]);
     exit;
   }
 
@@ -122,7 +131,7 @@ if ($method === "POST" && !isset($_GET["id"])) {
     $orderId = $stmt->insert_id;
     $stmt->close();
 
-    // Lưu order_items (KHÔNG có line_total)
+    // Lưu order_items
     $stmtItem = $db->prepare("
       INSERT INTO order_items (order_id, product_id, quantity, unit_price)
       VALUES (?, ?, ?, ?)
@@ -143,23 +152,25 @@ if ($method === "POST" && !isset($_GET["id"])) {
     $db->commit();
 
     echo json_encode([
-      "success" => true,
-      "order_id" => $orderId,
-      "order_code" => $orderCode,
-      "total_amount" => $totalAmount
+      "success"      => true,
+      "order_id"     => $orderId,
+      "order_code"   => $orderCode,
+      "total_amount" => $totalAmount,
+      // chỗ này nếu là VNPAY bạn build thêm payment_url
     ]);
-  }
-
-  catch (Throwable $e) {
+  } catch (Throwable $e) {
     $db->rollback();
+    http_response_code(500);
     echo json_encode([
-      "error" => "Lỗi lưu đơn hàng",
-      "message" => $e->getMessage()
+      "success" => false,
+      "error"   => "Lỗi lưu đơn hàng",
+      "message" => $e->getMessage(),
     ]);
   }
 
   exit;
 }
+
 
 // ===================================================
 // 2. CẬP NHẬT TRẠNG THÁI (ADMIN)
