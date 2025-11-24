@@ -74,8 +74,7 @@ export default function SuppliersPage() {
     fd.append("phone", form.phone);
     fd.append("email", form.email);
 
-    const url = editing ? `${API}?id=${editing.supplier_id}` : API;
-
+    const url = editing ? `${API}&id=${editing.supplier_id}` : API;
     try {
       const res = await fetch(url, { method: "POST", body: fd });
       const data = await res.json();
@@ -97,7 +96,7 @@ export default function SuppliersPage() {
   const onDelete = async (id: number) => {
     if (!confirm("Xoá nhà cung cấp này?")) return;
     try {
-      const res = await fetch(`${API}?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`${API}&id=${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         toast.success("Đã xoá nhà cung cấp");

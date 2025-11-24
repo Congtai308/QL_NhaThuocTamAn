@@ -130,7 +130,7 @@ export default function AdminOrders() {
     fd.append("shipping_name", form.shipping_name || "");
     fd.append("phone", form.phone || "");
 
-    const url = editing ? `${ORDER_API}?id=${editing.order_id}` : ORDER_API;
+    const url = editing ? `${ORDER_API}&id=${editing.order_id}` : ORDER_API;
 
     try {
       const res = await fetch(url, { method: "POST", body: fd });
@@ -152,7 +152,7 @@ export default function AdminOrders() {
   const onDelete = async (id: number) => {
     if (!confirm("Xoá đơn hàng này?")) return;
     try {
-      const res = await fetch(`${ORDER_API}?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`${ORDER_API}&id=${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         toast.success("Đã xoá đơn hàng");

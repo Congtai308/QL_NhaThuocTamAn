@@ -72,8 +72,7 @@ export default function EmployeesPage() {
     fd.append("email", form.email);
     fd.append("title", form.title);
 
-    const url = editing ? `${API}?id=${editing.employee_id}` : API;
-
+    const url = editing ? `${API}&id=${editing.employee_id}` : API;
     try {
       const res = await fetch(url, { method: "POST", body: fd });
       const data = await res.json();
@@ -93,8 +92,7 @@ export default function EmployeesPage() {
   const onDelete = async (id: number) => {
     if (!confirm("Xoá nhân viên này?")) return;
     try {
-      const res = await fetch(`${API}?id=${id}`, { method: "DELETE" });
-      const data = await res.json();
+      const res = await fetch(`${API}&id=${id}`, { method: "DELETE" });      const data = await res.json();
       if (data.success) {
         toast.success("Đã xoá nhân viên");
         setItems((prev) => prev.filter((x) => x.employee_id !== id));

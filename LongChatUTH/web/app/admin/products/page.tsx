@@ -155,7 +155,7 @@ export default function AdminProducts() {
       fd.append("image", editing.image);
     }
 
-    const url = editing ? `${API}?id=${editing.id}` : API;
+    const url = editing ? `${API}&id=${editing.id}` : API;
 
     try {
       const res = await fetch(url, { method: "POST", body: fd });
@@ -178,7 +178,7 @@ export default function AdminProducts() {
   const onDelete = async (id: number) => {
     if (!confirm("Xoá sản phẩm này?")) return;
     try {
-      const res = await fetch(`${API}?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`${API}&id=${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         toast.success("Đã xoá sản phẩm");
