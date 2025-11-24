@@ -54,7 +54,9 @@ $routes = [
   'related'              => 'related.php',   // sản phẩm liên quan
   'brands'               => 'brands.php',
   'register'             => 'register.php',
-  'login'                => 'login.php'
+  'login'                => 'login.php',
+  'orders'               => 'orders.php',
+  'locations'            => 'locations.php',
 ];
 
 // ---------------------------------------------------------

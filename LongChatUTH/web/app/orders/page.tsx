@@ -24,7 +24,6 @@ type OrderItem = {
 };
 
 const API = "/api/php?path=orders";
-
 export default function MyOrdersPage() {
   const searchParams = useSearchParams();
 

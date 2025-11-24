@@ -105,7 +105,7 @@ export default function CartPage() {
     const fetchProvinces = async () => {
       try {
         const res = await fetch(
-          "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/locations.php?type=province"
+          "/api/php?path=locations&type=province"
         );
         if (!res.ok) throw new Error("Status " + res.status);
         const data = await res.json();
@@ -142,7 +142,7 @@ export default function CartPage() {
 
     try {
       const res = await fetch(
-        `http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/locations.php?type=district&province_id=${id}`
+        `/api/php?path=locations&type=district&province_id=${id}`
       );
       if (!res.ok) throw new Error("Status " + res.status);
       const data = await res.json();
@@ -163,7 +163,7 @@ export default function CartPage() {
 
     try {
       const res = await fetch(
-        `http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/locations.php?type=ward&district_id=${id}`
+        `/api/php?path=locations&type=ward&district_id=${id}`
       );
       if (!res.ok) throw new Error("Status " + res.status);
       const data = await res.json();
