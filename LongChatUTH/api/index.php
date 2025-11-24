@@ -56,7 +56,7 @@ $routes = [
   'register'             => 'register.php',
   'login'                => 'login.php',
   'orders'               => 'orders.php',
-  'locations'            => 'locations.php',
+  'locations'            => 'locations.php'
 ];
 
 // ---------------------------------------------------------
