@@ -44,7 +44,7 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded bg-blue-800" />
-          <span className="font-bold text-lg text-blue-800">Nhà Thuốc</span>
+          <span className="font-bold text-lg text-blue-800">Nhà Thuốc Tâm An</span>
         </Link>
 
         {/* Menu */}
