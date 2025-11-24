@@ -22,10 +22,8 @@ type FormState = {
 
 type Category = { id: string | number; name: string };
 
-const API =
-  "/api/php?path=products";
-const CAT_API =
-  "/api/php?path=categories";
+const API = "/api/php?path=products";
+const CAT_API = "/api/php?path=categories";
 
 const initialForm: FormState = {
   name: "",
@@ -33,6 +31,19 @@ const initialForm: FormState = {
   category: "",
   manufacturer: "",
   image: null,
+};
+
+// Dùng HTTPS proxy cho ảnh sản phẩm
+const getProductImage = (url?: string | null) => {
+  if (!url) return "/no-image.png";
+  return `/api/img?src=${encodeURIComponent(url)}`;
+};
+
+// Preview: blob dùng trực tiếp, URL thì qua proxy
+const getPreviewSrc = (src: string | null) => {
+  if (!src) return null;
+  if (src.startsWith("blob:")) return src;
+  return getProductImage(src);
 };
 
 export default function AdminProducts() {
@@ -129,6 +140,7 @@ export default function AdminProducts() {
       manufacturer: p.manufacturer || "",
       image: null, // không gán string -> để backend giữ ảnh cũ nếu không upload mới
     });
+    // preview dùng URL gốc, lát nữa render sẽ qua getPreviewSrc
     setPreview(p.image || null);
     setOpen(true);
   };
@@ -152,6 +164,7 @@ export default function AdminProducts() {
     if (form.image) {
       fd.append("image", form.image);
     } else if (editing?.image) {
+      // gửi lại URL cũ để backend giữ nguyên
       fd.append("image", editing.image);
     }
 
@@ -314,7 +327,7 @@ export default function AdminProducts() {
                 <tr key={p.id} className="border-t hover:bg-gray-50">
                   <td className="p-2 text-center">
                     <img
-                      src={p.image || "/no-image.png"}
+                      src={getProductImage(p.image)}
                       className="w-14 h-14 rounded-lg object-cover border"
                     />
                   </td>
@@ -467,9 +480,9 @@ export default function AdminProducts() {
                     onChange={onPickImage}
                     className="border p-2 rounded-lg text-sm"
                   />
-                  {preview && (
+                  {getPreviewSrc(preview) && (
                     <img
-                      src={preview}
+                      src={getPreviewSrc(preview)!}
                       className="w-20 h-20 rounded-lg border object-cover shadow"
                     />
                   )}
