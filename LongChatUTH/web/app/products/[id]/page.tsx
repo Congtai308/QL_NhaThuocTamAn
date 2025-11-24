@@ -10,8 +10,9 @@ type Unit = { unit_name: string; price_value: number };
 type Product = {
   id: number | string;
   name: string;
-  image?: string | null;      // 👈 thêm
-  image_path?: string;
+  // thêm image cho đúng reality bên PHP
+  image?: string | null;
+  image_path?: string | null;
   price_text?: string;
   category?: string;
   brand?: string;
@@ -83,11 +84,11 @@ export default async function ProductDetailPage({
     units: (raw as any).units || [],
   };
 
-  // 🔥 Lấy ảnh ưu tiên từ cột `image`, fallback sang `image_path`
-  // và luôn đi qua helper imageUrl (→ /api/img?url=...)
-  const img = imageUrl(
-    (p as any).image || p.image_path || ""
-  );
+  // 🔥 QUAN TRỌNG: ưu tiên image, sau đó tới image_path
+  const rawImage =
+    (p as any).image || (p as any).thumbnail || p.image_path || "";
+
+  const img = rawImage ? imageUrl(rawImage) : "";
 
   return (
     <div className="space-y-6">
@@ -155,11 +156,11 @@ export default async function ProductDetailPage({
               )}
             </div>
 
-            {/* Client: giá, đơn vị, chọn mua, v.v. */}
+            {/* Client side: giá, chọn đơn vị, chọn số lượng, nút mua,... */}
             <ProductDetailClient
               productId={Number(p.id)}
               productName={p.name}
-              productImage={img}          // 👈 truyền ảnh đã chuẩn hoá
+              productImage={img}
               units={p.units || []}
               basePriceText={p.price_text}
               category={p.category}
@@ -188,8 +189,8 @@ export default async function ProductDetailPage({
 
         <p className="text-xs text-slate-500">
           Thực phẩm bảo vệ sức khỏe, không phải là thuốc và không có tác dụng
-          thay thế thuốc chữa bệnh. Vui lòng đọc kỹ hướng dẫn sử dụng trước
-          khi dùng.
+          thay thế thuốc chữa bệnh. Vui lòng đọc kỹ hướng dẫn sử dụng trước khi
+          dùng.
         </p>
       </section>
     </div>
