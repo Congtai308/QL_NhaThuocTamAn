@@ -35,7 +35,9 @@ if ($path === 'health') {
       '/api/index.php?path=brands',
       '/api/index.php?path=units&id=1',
       '/api/index.php?path=register',
-      '/api/index.php?path=login'
+      '/api/index.php?path=login',
+      '/api/index.php?path=orders',
+      '/api/index.php?path=locations&type=province',
     ]
   ]);
   exit;
@@ -56,7 +58,7 @@ $routes = [
   'register'             => 'register.php',
   'login'                => 'login.php',
   'orders'               => 'orders.php',
-  'locations'            => 'locations.php'
+  'locations'            => 'locations.php', // 🔥 quan trọng
 ];
 
 // ---------------------------------------------------------

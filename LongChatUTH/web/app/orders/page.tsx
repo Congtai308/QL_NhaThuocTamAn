@@ -71,7 +71,7 @@ export default function MyOrdersPage() {
     setOrders([]);
 
     try {
-      const res = await fetch(`${API}?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${API}&q=${encodeURIComponent(query)}`);
       const data = await res.json();
 
       const items: Order[] = Array.isArray(data.items) ? data.items : [];
@@ -95,7 +95,7 @@ export default function MyOrdersPage() {
 
   const fetchDetail = async (id: number) => {
     try {
-      const res = await fetch(`${API}?id=${id}`);
+      const res = await fetch(`${API}&id=${id}`);
       const data = await res.json();
       if (data.order) {
         setDetail(data);
