@@ -35,7 +35,7 @@ export default function Sidebar() {
       <div className="p-5 flex items-center justify-between border-b">
         {!collapsed && (
           <div>
-            <h1 className="text-blue-700 font-bold text-lg">💊 LongChau</h1>
+            <h1 className="text-blue-700 font-bold text-lg">💊 TamAn</h1>
             <p className="text-xs text-gray-500">Admin Panel</p>
           </div>
         )}
@@ -71,7 +71,7 @@ export default function Sidebar() {
 
       {!collapsed && (
         <footer className="text-center text-xs text-gray-500 border-t p-3">
-          © LongChâu Admin 2025
+          © TamAn Admin 2025
         </footer>
       )}
     </aside>

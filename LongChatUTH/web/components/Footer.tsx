@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 px-4">
         {/* Cột 1 */}
         <div>
-          <h4 className="font-semibold mb-2">Về Nhà thuốc LongChatUTH</h4>
+          <h4 className="font-semibold mb-2">Về Nhà thuốc Tâm An</h4>
           <ul className="space-y-1 opacity-80">
             <li><a href="#">Giới thiệu</a></li>
             <li><a href="#">Tuyển dụng</a></li>
@@ -30,7 +30,7 @@ export default function Footer() {
           <h4 className="font-semibold mb-2">Thông tin liên hệ</h4>
           <ul className="space-y-1 opacity-80">
             <li>Hotline: <strong>1800 9999</strong></li>
-            <li>Email: support@longchatuth.vn</li>
+            <li>Email: support@NhaThuocTamAn.vn</li>
             <li>Địa chỉ: 01 Võ Văn Ngân, TP. Thủ Đức</li>
           </ul>
         </div>
@@ -48,7 +48,7 @@ export default function Footer() {
       </div>
 
       <div className="text-center mt-10 text-xs opacity-70">
-        © 2025 Nhà thuốc LongChatUTH. Bản quyền thuộc về nhóm phát triển UTH.
+        © 2026 Nhà thuốc Tâm An. Bản quyền thuộc về nhóm phát triển UTH.
       </div>
     </footer>
   );

@@ -53,7 +53,7 @@ export default async function Home() {
       <div className="w-full bg-[#0a56c5] text-white text-[13px]">
         <div className="max-w-6xl mx-auto px-4 h-9 sm:h-10 flex items-center justify-between">
           <span className="truncate">
-            Trung tâm tìm hiểu Long Châu • Luôn đồng hành sức khỏe
+            Trung tâm tìm hiểu Tâm An • Luôn đồng hành sức khỏe
           </span>
           <div className="hidden md:flex items-center gap-6 opacity-90">
             <span>Tải ứng dụng</span>

@@ -507,7 +507,7 @@ export default function CartPage() {
                 <div className="space-y-3 text-sm text-slate-600">
                   <div className="rounded-xl border p-4">
                     <div className="font-medium">
-                      Nhà thuốc Long Châu - Quận 1
+                      Nhà thuốc Tâm An - Quận 1
                     </div>
                     <div>379 Hai Bà Trưng, P. Võ Thị Sáu</div>
                     <div className="text-xs text-slate-500 mt-1">
@@ -516,7 +516,7 @@ export default function CartPage() {
                   </div>
                   <div className="rounded-xl border p-4">
                     <div className="font-medium">
-                      Nhà thuốc Long Châu - Phú Nhuận
+                      Nhà thuốc Tâm An - Phú Nhuận
                     </div>
                     <div>120 Phan Đình Phùng, P. 2</div>
                     <div className="text-xs text-slate-500 mt-1">

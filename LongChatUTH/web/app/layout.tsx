@@ -4,8 +4,8 @@ import SessionWrapper from "@/components/providers/SessionWrapper";
 import ClientLayout from "@/components/ClientLayout";
 
 export const metadata: Metadata = {
-  title: "Nhà Thuốc Long Châu Clone",
-  description: "Giao diện demo",
+  title: "Nhà Thuốc Tâm An",
+  description: "Website Nhà Tâm An",
 };
 
 export default function RootLayout({

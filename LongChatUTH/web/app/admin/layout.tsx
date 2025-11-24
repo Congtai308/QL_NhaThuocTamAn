@@ -6,8 +6,8 @@ import Sidebar from "@/components/admin/Sidebar"; // ✅ thêm
 import AdminHeader from "@/components/admin/AdminHeader"; // ✅ thêm
 
 export const metadata = {
-  title: "Admin Dashboard - Nhà Thuốc Long Châu",
-  description: "Trang quản trị hệ thống Long Châu",
+  title: "Admin Dashboard - Nhà Thuốc Tâm An",
+  description: "Trang quản trị hệ thống Tâm An",
 };
 
 export const dynamic = "force-dynamic";
