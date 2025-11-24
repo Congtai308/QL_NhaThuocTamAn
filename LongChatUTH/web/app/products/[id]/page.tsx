@@ -1,28 +1,11 @@
 ﻿// app/products/[id]/page.tsx
-import { fetchProductById, imageUrl } from "@/lib/api";
+import { fetchProductById, imageUrl, type Product } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductDetailClient from "./ProductDetailClient";
 
 type Unit = { unit_name: string; price_value: number };
-
-type Product = {
-  id: number | string;
-  name: string;
-  // thêm image cho đúng reality bên PHP
-  image?: string | null;
-  image_path?: string | null;
-  price_text?: string;
-  category?: string;
-  brand?: string;
-  form?: string;
-  size_spec?: string;
-  manufacturer?: string;
-  origin?: string;
-  ingredient?: string;
-  units?: Unit[];
-};
 
 function Gallery({ src, alt }: { src?: string; alt: string }) {
   return (
@@ -44,24 +27,24 @@ function Gallery({ src, alt }: { src?: string; alt: string }) {
         </div>
       </div>
 
+      {/* thumbnails bên dưới: nếu không có ảnh thì để trống luôn */}
       <div className="flex gap-2 overflow-x-auto pb-1">
-        {[0, 1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="w-16 h-16 rounded-xl border border-slate-100 bg-white shadow-sm p-1 flex-shrink-0"
-          >
-            <div className="relative w-full h-full bg-slate-50 rounded-lg overflow-hidden">
-              {src ? (
+        {src &&
+          [0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="w-16 h-16 rounded-xl border border-slate-100 bg-white shadow-sm p-1 flex-shrink-0"
+            >
+              <div className="relative w-full h-full bg-slate-50 rounded-lg overflow-hidden">
                 <Image
                   src={src}
                   alt={`${alt} thumb ${i + 1}`}
                   fill
                   className="object-contain p-1 sm:p-2"
                 />
-              ) : null}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       <div className="text-[11px] text-slate-500">
@@ -79,16 +62,21 @@ export default async function ProductDetailPage({
   const raw = (await fetchProductById(params.id)) as Product | null;
   if (!raw) return notFound();
 
-  const p: Product = {
-    ...raw,
+  // Lấy đúng field ảnh từ API PHP:
+  // - ưu tiên cột `image` (chúng ta vừa update DB)
+  // - fallback: thumbnail / image_path (nếu sau này có thêm)
+  const rawImg =
+    (raw as any).image ||
+    (raw as any).thumbnail ||
+    (raw as any).image_path ||
+    "";
+
+  const img = rawImg ? imageUrl(rawImg) : "";
+
+  const p: Product & { units?: Unit[] } = {
+    ...(raw as any),
     units: (raw as any).units || [],
   };
-
-  // 🔥 QUAN TRỌNG: ưu tiên image, sau đó tới image_path
-  const rawImage =
-    (p as any).image || (p as any).thumbnail || p.image_path || "";
-
-  const img = rawImage ? imageUrl(rawImage) : "";
 
   return (
     <div className="space-y-6">
@@ -131,7 +119,7 @@ export default async function ProductDetailPage({
             <div className="text-[11px] sm:text-xs uppercase tracking-wide text-slate-500">
               Thương hiệu:{" "}
               <span className="text-blue-700 font-semibold">
-                {p.brand || p.manufacturer || "Đang cập nhật"}
+                {(p as any).brand || p.manufacturer || "Đang cập nhật"}
               </span>
             </div>
 
@@ -140,33 +128,35 @@ export default async function ProductDetailPage({
             </h1>
 
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
-              {p.form && (
+              {(p as any).form && (
                 <span>
                   Dạng bào chế:{" "}
-                  <span className="font-medium text-slate-800">{p.form}</span>
+                  <span className="font-medium text-slate-800">
+                    {(p as any).form}
+                  </span>
                 </span>
               )}
-              {p.size_spec && (
+              {(p as any).size_spec && (
                 <span>
                   Quy cách:{" "}
                   <span className="font-medium text-slate-800">
-                    {p.size_spec}
+                    {(p as any).size_spec}
                   </span>
                 </span>
               )}
             </div>
 
-            {/* Client side: giá, chọn đơn vị, chọn số lượng, nút mua,... */}
+            {/* Giá, chọn đơn vị, nút chọn mua, vv... */}
             <ProductDetailClient
               productId={Number(p.id)}
               productName={p.name}
               productImage={img}
-              units={p.units || []}
-              basePriceText={p.price_text}
+              units={(p as any).units || []}
+              basePriceText={(p as any).price_text}
               category={p.category}
               manufacturer={p.manufacturer}
-              origin={p.origin}
-              sizeSpec={p.size_spec}
+              origin={(p as any).origin}
+              sizeSpec={(p as any).size_spec}
             />
           </div>
         </div>
@@ -183,7 +173,7 @@ export default async function ProductDetailPage({
             Thành phần
           </div>
           <div className="px-4 py-3 text-sm text-slate-700 whitespace-pre-line">
-            {p.ingredient || "Đang cập nhật thông tin thành phần."}
+            {(p as any).ingredient || "Đang cập nhật thông tin thành phần."}
           </div>
         </div>
 

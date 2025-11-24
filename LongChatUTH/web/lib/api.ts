@@ -9,7 +9,8 @@ export const IMAGE_BASE =
 // lib/api.ts
 
 export function imageUrl(src?: string | null) {
-  if (!src) return "/no-image.png";
+  // Không có src -> trả chuỗi rỗng, để component tự xử lý fallback
+  if (!src) return "";
 
   // Nếu đã là proxy rồi thì trả luôn
   if (src.startsWith("/api/img")) return src;
