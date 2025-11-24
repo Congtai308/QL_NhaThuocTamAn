@@ -6,12 +6,23 @@ export const API_BASE =
 export const IMAGE_BASE =
   process.env.NEXT_PUBLIC_IMAGE_BASE || "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/";
 
-// Build URL ảnh tuyệt đối
-export function imageUrl(p?: string | null) {
-  if (!p) return "";
-  if (/^https?:\/\//i.test(p)) return p;
-  return `${IMAGE_BASE}${p.replace(/^\/+/, "")}`;
+// lib/api.ts
+
+export function imageUrl(src?: string | null) {
+  if (!src) return "/no-image.png";
+
+  // Nếu đã là proxy rồi thì trả luôn
+  if (src.startsWith("/api/img")) return src;
+
+  // Link http/https từ PHP -> đi qua proxy
+  if (src.startsWith("http://") || src.startsWith("https://")) {
+    return `/api/img?url=${encodeURIComponent(src)}`;
+  }
+
+  // Trường hợp ảnh local trong FE ( /flashsale-banner.webp, /logo.png,... )
+  return src;
 }
+
 
 export type ProductUnit = {
   unit_name: string;

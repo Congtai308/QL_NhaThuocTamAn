@@ -34,10 +34,10 @@ export default function ProductCard({ p }: { p: Product }) {
   );
 
   // 👉 Ưu tiên dùng cột price (number) trong DB, nếu không có thì dùng price_text cũ
-  const rawPrice = (p as any).price ?? p.price_text;
+  const rawPrice = (p as any).price ?? (p as any).price_text;
   const priceNumber = parsePrice(rawPrice);
 
-  const unit = parseUnit(p.price_text, "Hộp");
+  const unit = parseUnit((p as any).price_text, "Hộp");
 
   // Giá hiển thị: nếu có price_text thì giữ nguyên, không thì format từ number
   const displayPrice =
@@ -47,16 +47,20 @@ export default function ProductCard({ p }: { p: Product }) {
       ? money(priceNumber)
       : "Liên hệ";
 
+  // 🔥 QUAN TRỌNG: lấy ảnh từ cột `image` của PHP
   const imageSrc = useMemo(
-    () => imageUrl(p.image_path || (p as any).image || ""),
-    [p.image_path, (p as any).image]
+    () =>
+      imageUrl(
+        (p as any).image || (p as any).thumbnail || (p as any).image_path || ""
+      ),
+    [p]
   );
 
   const handleAdd = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-  
+
       const item = {
         id: Number(p.id),
         name: p.name,
@@ -65,14 +69,13 @@ export default function ProductCard({ p }: { p: Product }) {
         image: imageSrc || undefined,
         qty: 1,
       };
-  
+
       add(item, 1);
-  
-      // truyền item vào showPeek để đúng kiểu TypeScript
       showPeek(item as any);
     },
     [add, showPeek, p.id, p.name, imageSrc, priceNumber, unit]
   );
+
   return (
     <div className="rounded-2xl border bg-white p-3 flex flex-col justify-between h-full">
       {/* Block ảnh */}
@@ -104,8 +107,8 @@ export default function ProductCard({ p }: { p: Product }) {
         </Link>
 
         <div className="mt-1 text-xs text-gray-500">
-          {p.brand}
-          {p.brand && p.category ? " • " : ""}
+          {(p as any).brand}
+          {(p as any).brand && p.category ? " • " : ""}
           {p.category}
         </div>
 
