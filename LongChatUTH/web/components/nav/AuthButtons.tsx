@@ -48,37 +48,51 @@ export default function AuthButtons() {
   }
 
   // Đã đăng nhập → chào + vai trò + nút đăng xuất
-  if (session?.user) {
-    const displayName = session.user.name || session.user.email || "Người dùng";
-    const role = (session.user as any).role || "user";
+if (session?.user) {
+  const displayName = session.user.name || session.user.email || "Người dùng";
+  const role = (session.user as any).role || "user";
 
-    return (
-      <div className="flex items-center gap-3">
-        <span className="hidden sm:inline text-sm text-slate-100/90">
-          👋 Xin chào <span className="font-semibold">{displayName}</span>
-        </span>
-        <span
-          className={`text-[11px] px-2 py-1 rounded-full border bg-white/95 ${
-            role === "admin"
-              ? "text-red-600 border-red-200"
-              : role === "employee"
-              ? "text-amber-600 border-amber-200"
-              : "text-emerald-600 border-emerald-200"
-          }`}
+  return (
+    <div className="flex items-center gap-3">
+      <span className="hidden sm:inline text-sm text-slate-100/90">
+        👋 Xin chào <span className="font-semibold">{displayName}</span>
+      </span>
+
+      {/* ROLE BADGE */}
+      <span
+        className={`text-[11px] px-2 py-1 rounded-full border bg-white/95 ${
+          role === "admin"
+            ? "text-red-600 border-red-200"
+            : role === "employee"
+            ? "text-amber-600 border-amber-200"
+            : "text-emerald-600 border-emerald-200"
+        }`}
+      >
+        {role.toUpperCase()}
+      </span>
+
+      {/* 🔥 NÚT ADMIN – CHỈ HIỆN CHO TÀI KHOẢN ADMIN */}
+      {role === "admin" && (
+        <a
+          href="/admin/dashboard"
+          className="rounded-full px-4 py-2 text-xs sm:text-sm font-semibold bg-red-600 text-white border border-red-600 hover:bg-red-700"
         >
-          {role.toUpperCase()}
-        </span>
-        <button
-          onClick={() => signOut({ callbackUrl: "/" })}
-          className="rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-colors border
-                     bg-white text-[#0a56c5] border-[#0a56c5] hover:bg-blue-50
-                     active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
-        >
-          Đăng xuất
-        </button>
-      </div>
-    );
-  }
+          ADMIN
+        </a>
+      )}
+
+      {/* Đăng xuất */}
+      <button
+        onClick={() => signOut({ callbackUrl: "/" })}
+        className="rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-colors border
+                   bg-white text-[#0a56c5] border-[#0a56c5] hover:bg-blue-50
+                   active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
+      >
+        Đăng xuất
+      </button>
+    </div>
+  );
+}
 
   // Chưa đăng nhập → 2 nút Đăng ký / Đăng nhập (mở popup, không đổi route)
   const isLogin = pathname === "/login";
