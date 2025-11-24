@@ -15,7 +15,7 @@ const slides = [
   {
     id: 2,
     desktop:
-      "https://cdn.nhathuoclongchau.com.vn/unsafe/https://cms-prod.s3-sgn09.fptcloud.com/Artboard_6_3_b3becbb567.jpg",
+      "https://standboothvietnam.com/wp-content/uploads/2024/04/pharmacity-1-9330.jpg",
     mobile: "/banners/hero-2-800.jpg",
     title: "Hiểu về ung thư từ A-Z",
   },
