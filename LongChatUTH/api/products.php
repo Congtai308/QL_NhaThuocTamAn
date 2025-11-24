@@ -15,6 +15,51 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $method = $_SERVER["REQUEST_METHOD"];
 
+// ====== CẤU HÌNH ĐƯỜNG DẪN ẢNH ======
+$PUBLIC_BASE      = "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/";
+$PUBLIC_UPLOAD_URL = $PUBLIC_BASE . "uploads/";
+$UPLOAD_DIR        = __DIR__ . "/../uploads/"; // thư mục uploads nằm cạnh folder api
+
+/**
+ * Chuẩn hoá URL ảnh về domain thật:
+ *  - Nếu đã là http/https:
+ *      + Nếu chứa localhost / 127.0.0.1 -> thay thành $PUBLIC_BASE
+ *      + Ngược lại giữ nguyên
+ *  - Nếu là tên file / path tương đối -> gắn $PUBLIC_UPLOAD_URL
+ */
+function normalize_image_url(?string $image, string $publicBase, string $publicUploadUrl): string {
+  if (!$image) return "";
+
+  // Đã là URL đầy đủ
+  if (strpos($image, "http://") === 0 || strpos($image, "https://") === 0) {
+    // convert localhost → domain thật
+    $replaced = str_replace(
+      ["http://localhost:9000/", "http://127.0.0.1/"],
+      $publicBase,
+      $image
+    );
+    return $replaced;
+  }
+
+  // Chỉ lưu tên file / path tương đối
+  return rtrim($publicUploadUrl, "/") . "/" . basename($image);
+}
+
+/**
+ * Chuyển URL ảnh (hoặc tên file) -> đường dẫn file local trong thư mục uploads
+ */
+function image_url_to_local_path(string $img, string $uploadDir): string {
+  if (!$img) return "";
+  // Nếu là URL -> tách path lấy basename
+  if (strpos($img, "http://") === 0 || strpos($img, "https://") === 0) {
+    $path = parse_url($img, PHP_URL_PATH) ?? "";
+    $filename = basename($path);
+  } else {
+    $filename = basename($img);
+  }
+  return rtrim($uploadDir, "/") . "/" . $filename;
+}
+
 try {
   $db = new mysqli(
     "127.0.0.1",
@@ -47,7 +92,14 @@ try {
         $res = $stmt->get_result();
         $row = $res->fetch_assoc();
 
-        if ($row && isset($row["image"]) && !isset($row["thumbnail"])) {
+        if ($row) {
+          // Chuẩn hoá URL ảnh
+          $row["image"] = normalize_image_url(
+            $row["image"] ?? "",
+            $PUBLIC_BASE,
+            $PUBLIC_UPLOAD_URL
+          );
+          // Luôn có thumbnail = image cho FE
           $row["thumbnail"] = $row["image"];
         }
 
@@ -56,9 +108,12 @@ try {
         $res = $db->query("SELECT * FROM products ORDER BY id DESC");
         $rows = [];
         while ($r = $res->fetch_assoc()) {
-          if (isset($r["image"]) && !isset($r["thumbnail"])) {
-            $r["thumbnail"] = $r["image"];
-          }
+          $r["image"] = normalize_image_url(
+            $r["image"] ?? "",
+            $PUBLIC_BASE,
+            $PUBLIC_UPLOAD_URL
+          );
+          $r["thumbnail"] = $r["image"];
           $rows[] = $r;
         }
         echo json_encode(["items" => $rows]);
@@ -76,23 +131,44 @@ try {
 
       // --- Upload ảnh (nếu có) ---
       if (!empty($_FILES["image"]["name"]) && is_uploaded_file($_FILES["image"]["tmp_name"])) {
-        $target_dir = "../uploads/";
-        if (!is_dir($target_dir)) {
-          mkdir($target_dir, 0777, true);
+        if (!is_dir($UPLOAD_DIR)) {
+          mkdir($UPLOAD_DIR, 0777, true);
         }
 
         $filename    = time() . "_" . basename($_FILES["image"]["name"]);
-        $target_file = $target_dir . $filename;
+        $target_file = $UPLOAD_DIR . $filename;
 
         if (!move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
           throw new RuntimeException("Không thể upload file ảnh");
         }
 
         // URL public để FE dùng trực tiếp
-        $image_url = "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/uploads/" . $filename;
+        $image_url = $PUBLIC_UPLOAD_URL . $filename;
       } else {
         // Khi sửa mà không chọn ảnh mới -> FE gửi lại URL cũ trong field image
         $image_url = $_POST["image"] ?? "";
+
+        // Chuẩn hoá luôn (fix những bản ghi cũ localhost / tên file)
+        if (!empty($image_url)) {
+          $image_url = normalize_image_url(
+            $image_url,
+            $PUBLIC_BASE,
+            $PUBLIC_UPLOAD_URL
+          );
+        } elseif ($id) {
+          // Nếu là UPDATE mà FE không gửi image -> giữ ảnh cũ trong DB
+          $stmt = $db->prepare("SELECT image FROM products WHERE id = ?");
+          $stmt->bind_param("i", $id);
+          $stmt->execute();
+          $stmt->bind_result($oldImg);
+          $stmt->fetch();
+          $stmt->close();
+          $image_url = normalize_image_url(
+            $oldImg ?? "",
+            $PUBLIC_BASE,
+            $PUBLIC_UPLOAD_URL
+          );
+        }
       }
 
       if ($id) {
@@ -141,7 +217,7 @@ try {
         break;
       }
 
-      // Lấy đường dẫn ảnh trước (nhưng CHƯA xoá file vội)
+      // Lấy đường dẫn ảnh trước
       $stmt = $db->prepare("SELECT image FROM products WHERE id = ?");
       $stmt->bind_param("i", $id);
       $stmt->execute();
@@ -166,11 +242,7 @@ try {
 
         // Xoá file ảnh sau khi xoá DB thành công
         if (!empty($img)) {
-          $localPath = str_replace(
-            "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/",
-            "../",
-            $img
-          );
+          $localPath = image_url_to_local_path($img, $UPLOAD_DIR);
           if (is_file($localPath)) {
             @unlink($localPath);
           }
