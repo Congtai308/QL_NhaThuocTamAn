@@ -10,6 +10,7 @@ type Unit = { unit_name: string; price_value: number };
 type Product = {
   id: number | string;
   name: string;
+  image?: string | null;      // 👈 thêm
   image_path?: string;
   price_text?: string;
   category?: string;
@@ -82,7 +83,11 @@ export default async function ProductDetailPage({
     units: (raw as any).units || [],
   };
 
-  const img = p.image_path ? imageUrl(p.image_path) : "";
+  // 🔥 Lấy ảnh ưu tiên từ cột `image`, fallback sang `image_path`
+  // và luôn đi qua helper imageUrl (→ /api/img?url=...)
+  const img = imageUrl(
+    (p as any).image || p.image_path || ""
+  );
 
   return (
     <div className="space-y-6">
@@ -150,12 +155,11 @@ export default async function ProductDetailPage({
               )}
             </div>
 
-            {/* 🔹 Ở đây ProductDetailClient sẽ hiển thị: giá, chọn đơn vị,
-                bảng info thuốc, chọn số lượng, nút chọn mua, Tìm nhà thuốc, cam kết */}
+            {/* Client: giá, đơn vị, chọn mua, v.v. */}
             <ProductDetailClient
               productId={Number(p.id)}
               productName={p.name}
-              productImage={img}
+              productImage={img}          // 👈 truyền ảnh đã chuẩn hoá
               units={p.units || []}
               basePriceText={p.price_text}
               category={p.category}
