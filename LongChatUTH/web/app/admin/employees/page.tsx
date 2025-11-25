@@ -1,6 +1,7 @@
+// app/admin/employees/page.tsx
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 
 type Employee = {
@@ -18,7 +19,8 @@ type FormState = {
   title: string;
 };
 
-const API = "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/employees.php";
+// ❗ Dùng proxy giống products
+const API = "/api/php?path=employees";
 
 const initialForm: FormState = {
   full_name: "",

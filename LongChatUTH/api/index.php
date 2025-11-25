@@ -59,6 +59,8 @@ $routes = [
   'login'                => 'login.php',
   'orders'               => 'orders.php',
   'locations'            => 'locations.php', // 🔥 quan trọng
+  'employees'            => 'employees.php',
+  'suppliers'            => 'suppliers.php',
 ];
 
 // ---------------------------------------------------------
