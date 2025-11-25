@@ -1,65 +1,82 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Content-Type: application/json; charset=UTF-8");
+// api/register.php
+require_once __DIR__ . '/db.php';       // tạo $conn (PDO)
+require_once __DIR__ . '/helpers.php';  // cors_json(), ok(), bad()
 
-if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
-    http_response_code(200);
-    exit();
+// Bật CORS + JSON header
+cors_json();
+
+// Chỉ cho POST + OPTIONS
+$method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'OPTIONS') {
+  http_response_code(200);
+  exit;
 }
 
-// ✅ Kết nối DB
-$servername = "127.0.0.1";
-$username = "sql_nhom37_itimi";
-$password = "22f35426abc4d8";
-$dbname = "sql_nhom37_itimi";
-$port = "3306";
-
-$conn = new mysqli($servername, $username, $password, $dbname, $port);
-if ($conn->connect_error) {
-    http_response_code(500);
-    echo json_encode(["success" => false, "message" => "Lỗi kết nối database"]);
-    exit();
+if ($method !== 'POST') {
+  bad('Method not allowed', 405);
+  exit;
 }
 
-// ✅ Nhận dữ liệu từ client
-$input = json_decode(file_get_contents("php://input"), true);
-$fullname = trim($input["fullname"] ?? "");
-$email = trim($input["email"] ?? "");
-$password = trim($input["password"] ?? "");
+try {
+  // Đọc raw body
+  $raw = file_get_contents('php://input');
+  $data = [];
 
-// ✅ Kiểm tra đầu vào
-if (empty($email) || empty($password)) {
-    http_response_code(400);
-    echo json_encode(["success" => false, "message" => "Thiếu email hoặc mật khẩu"]);
-    exit();
+  // Thử parse JSON
+  if ($raw !== false && strlen(trim($raw)) > 0) {
+    $json = json_decode($raw, true);
+    if (is_array($json)) {
+      $data = $json;
+    } else {
+      // Nếu không phải JSON (ví dụ: a=b&c=d) thì parse dạng query string
+      parse_str($raw, $parsed);
+      if (is_array($parsed)) {
+        $data = $parsed;
+      }
+    }
+  }
+
+  // Nếu vẫn rỗng thì fallback sang $_POST
+  if (empty($data) && !empty($_POST)) {
+    $data = $_POST;
+  }
+
+  $fullname = trim($data['fullname'] ?? '');
+  $email    = trim($data['email'] ?? '');
+  $password = trim($data['password'] ?? '');
+
+  // Validate
+  if ($email === '' || $password === '') {
+    bad('Thiếu email hoặc mật khẩu', 400);
+  }
+
+  // Kiểm tra trùng email
+  $stmt = $conn->prepare('SELECT user_id FROM users WHERE email = ? LIMIT 1');
+  $stmt->execute([$email]);
+  if ($stmt->fetchColumn()) {
+    ok([
+      'success' => false,
+      'message' => 'Email đã tồn tại'
+    ]);
+    exit;
+  }
+
+  // Hash password & insert
+  $hashed = password_hash($password, PASSWORD_DEFAULT);
+
+  $insert = $conn->prepare(
+    'INSERT INTO users (email, password_hash, full_name, created_at, updated_at)
+     VALUES (?, ?, ?, NOW(), NOW())'
+  );
+  $insert->execute([$email, $hashed, $fullname]);
+
+  ok([
+    'success' => true,
+    'message' => 'Đăng ký thành công',
+    'user_id' => $conn->lastInsertId(),
+  ]);
+} catch (Throwable $e) {
+  bad('Lỗi server: ' . $e->getMessage(), 500);
 }
-
-// ✅ Kiểm tra trùng email
-$check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
-$check->bind_param("s", $email);
-$check->execute();
-$check->store_result();
-
-if ($check->num_rows > 0) {
-    echo json_encode(["success" => false, "message" => "Email đã tồn tại"]);
-    exit();
-}
-$check->close();
-
-// ✅ Mã hoá mật khẩu & lưu
-$hashed = password_hash($password, PASSWORD_DEFAULT);
-$stmt = $conn->prepare("INSERT INTO users (email, password_hash, full_name, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
-$stmt->bind_param("sss", $email, $hashed, $fullname);
-
-if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Đăng ký thành công"]);
-} else {
-    http_response_code(500);
-    echo json_encode(["success" => false, "message" => "Lỗi khi ghi dữ liệu", "error" => $stmt->error]);
-}
-
-$stmt->close();
-$conn->close();
-?>
