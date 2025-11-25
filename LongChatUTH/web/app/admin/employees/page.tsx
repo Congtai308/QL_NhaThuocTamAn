@@ -18,7 +18,7 @@ type FormState = {
   title: string;
 };
 
-const API = "/api/php?path=employees";
+const API = "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/employees.php";
 
 const initialForm: FormState = {
   full_name: "",
