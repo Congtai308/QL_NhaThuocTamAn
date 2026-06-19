@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Có thể dùng biến môi trường nếu muốn, còn không thì giữ cứng như dưới
 const BACKEND_BASE =
-  "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api";
+process.env.BACKEND_BASE ||"http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -68,8 +68,7 @@ async function handleProxy(req: NextRequest) {
       status: res.status,
       headers: {
         "content-type":
-          res.headers.get("content-type") ||
-          "application/json; charset=utf-8",
+          res.headers.get("content-type") || "application/json; charset=utf-8",
       },
     });
   } catch (err: any) {
