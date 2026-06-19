@@ -1,10 +1,10 @@
 ﻿// lib/api.ts
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api/index.php";
+  "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/index.php";
 
 export const IMAGE_BASE =
-  process.env.NEXT_PUBLIC_IMAGE_BASE || "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/";
+  process.env.NEXT_PUBLIC_IMAGE_BASE || "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/";
 
 // lib/api.ts
 

@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // ====== CẤU HÌNH ĐƯỜNG DẪN CỐ ĐỊNH ======
-define("APP_BASE_URL", "https://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH"); // dùng https
+define("APP_BASE_URL", "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH"); // dùng https
 define("UPLOAD_DIR", __DIR__ . "/../uploads/");     // thư mục thật để lưu file
 define("UPLOAD_URL", APP_BASE_URL . "/uploads/");   // URL public để FE load ảnh
 
@@ -21,10 +21,10 @@ $method = $_SERVER["REQUEST_METHOD"];
 
 try {
   $db = new mysqli(
-    "127.0.0.1",
-    "sql_nhom37_itimi",
-    "22f35426abc4d8",
-    "sql_nhom37_itimi",
+    "sql204.infinityfree.com",
+    "if0_42200791",
+    "Nctai656",
+    "if0_42200791_nhathuoctaman",
     3306
   );
   $db->set_charset("utf8mb4");

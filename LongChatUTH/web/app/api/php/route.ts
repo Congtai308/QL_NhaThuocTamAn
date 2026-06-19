@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Có thể dùng biến môi trường nếu muốn, còn không thì giữ cứng như dưới
 const BACKEND_BASE =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api";
+  "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

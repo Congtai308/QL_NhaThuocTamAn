@@ -2,7 +2,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
 
 const PHP_BASE =
-  "http://nhom37.itimit.id.vn/QL_NhaThuocTamAn/LongChatUTH/api";
+  "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api";
 
 export const authOptions: NextAuthOptions = {
   providers: [

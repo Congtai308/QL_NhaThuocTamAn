@@ -1,9 +1,9 @@
 <?php
 // Thông tin kết nối MySQL
-$host = "127.0.0.1";      // tên server (thường là localhost)
-$db_name = "sql_nhom37_itimi"; // tên database bạn đã tạo
-$username = "sql_nhom37_itimi";        // user MySQL (mặc định thường là root)
-$password = "22f35426abc4d8";            // mật khẩu MySQL (nếu có thì điền vào)
+$host = "sql204.infinityfree.com";      // tên server (thường là localhost)
+$db_name = "if0_42200791_nhathuoctaman"; // tên database bạn đã tạo
+$username = "if0_42200791";        // user MySQL (mặc định thường là root)
+$password = "Nctai656";            // mật khẩu MySQL (nếu có thì điền vào)
 $port = "3306";
 // Kết nối CSDL bằng PDO
 try {
