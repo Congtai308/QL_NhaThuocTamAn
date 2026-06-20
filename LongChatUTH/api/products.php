@@ -1,4 +1,5 @@
 <?php
+file_put_contents(__DIR__.'/debug.txt', date('Y-m-d H:i:s')."\n", FILE_APPEND);
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
@@ -13,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // ====== CẤU HÌNH ĐƯỜNG DẪN CỐ ĐỊNH ======
-define("APP_BASE_URL", "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH"); // dùng https
+define("APP_BASE_URL", "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH"); // dùng https
 define("UPLOAD_DIR", __DIR__ . "/../uploads/");     // thư mục thật để lưu file
 define("UPLOAD_URL", APP_BASE_URL . "/uploads/");   // URL public để FE load ảnh
 
