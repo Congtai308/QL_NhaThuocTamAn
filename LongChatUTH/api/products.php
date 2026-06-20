@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // ====== CẤU HÌNH ĐƯỜNG DẪN CỐ ĐỊNH ======
-define("APP_BASE_URL", "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH"); // dùng https
+define("APP_BASE_URL", "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH"); // dùng https
 define("UPLOAD_DIR", __DIR__ . "/../uploads/");     // thư mục thật để lưu file
 define("UPLOAD_URL", APP_BASE_URL . "/uploads/");   // URL public để FE load ảnh
 
