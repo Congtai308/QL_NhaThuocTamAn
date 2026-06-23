@@ -1,24 +1,27 @@
-﻿export const IMAGE_BASE =
-  process.env.NEXT_PUBLIC_IMAGE_BASE ||
-  "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/";
-
+﻿// lib/api.ts
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
-  "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/index.php";
+  "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/index.php";
+
+export const IMAGE_BASE =
+  process.env.NEXT_PUBLIC_IMAGE_BASE || "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/";
+
+// lib/api.ts
 
 export function imageUrl(src?: string | null) {
+  // Không có src -> trả chuỗi rỗng, để component tự xử lý fallback
   if (!src) return "";
 
-  // Đã là proxy rồi
+  // Nếu đã là proxy rồi thì trả luôn
   if (src.startsWith("/api/img")) return src;
 
-  // URL tuyệt đối (http/https) → đi qua proxy
+  // Link http/https từ PHP -> đi qua proxy
   if (src.startsWith("http://") || src.startsWith("https://")) {
     return `/api/img?url=${encodeURIComponent(src)}`;
   }
 
-  // Path tương đối như "images/ten_file.jpg" → ghép với IMAGE_BASE
-  return `${IMAGE_BASE}${src}`;
+  // Trường hợp ảnh local trong FE ( /flashsale-banner.webp, /logo.png,... )
+  return src;
 }
 
 
