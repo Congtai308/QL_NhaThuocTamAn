@@ -11,7 +11,7 @@ export default function BestSellers() {
 
   const url = useMemo(
     () =>
-      `/api/php?path=products&page=${page}&limit=${limit}`,
+      `http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/php?path=products&page=${page}&limit=${limit}`,
     [page]
   );
 
