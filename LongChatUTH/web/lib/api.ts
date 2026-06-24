@@ -1,29 +1,25 @@
 ﻿// lib/api.ts
+
+// Server-side dùng URL thật, client-side dùng proxy /api/php
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
-  "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/index.php";
+  (typeof window === "undefined"
+    ? "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/index.php"
+    : "/api/php");
 
 export const IMAGE_BASE =
-  process.env.NEXT_PUBLIC_IMAGE_BASE || "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/";
-
-// lib/api.ts
+  process.env.NEXT_PUBLIC_IMAGE_BASE ||
+  "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/";
 
 export function imageUrl(src?: string | null) {
-  // Không có src -> trả chuỗi rỗng, để component tự xử lý fallback
   if (!src) return "";
-
-  // Nếu đã là proxy rồi thì trả luôn
   if (src.startsWith("/api/img")) return src;
-
-  // Link http/https từ PHP -> đi qua proxy
   if (src.startsWith("http://") || src.startsWith("https://")) {
     return `/api/img?url=${encodeURIComponent(src)}`;
   }
-
-  // Trường hợp ảnh local trong FE ( /flashsale-banner.webp, /logo.png,... )
-  return src;
+  // Path tương đối như "images/ten_file.jpg" → ghép IMAGE_BASE
+  return `${IMAGE_BASE}${src}`;
 }
-
 
 export type ProductUnit = {
   unit_name: string;
@@ -44,7 +40,7 @@ export type Product = {
   ingredient?: string;
   image?: string | null;
   image_path?: string;
-  units?: ProductUnit[]; // 👈 thêm cho đồng bộ với product_detail.php
+  units?: ProductUnit[];
 };
 
 export async function fetchProducts(page = 1, limit = 20) {
@@ -61,25 +57,19 @@ export async function fetchProducts(page = 1, limit = 20) {
   }>;
 }
 
-export async function fetchProductById(
-  id: string | number
-): Promise<Product> {
+export async function fetchProductById(id: string | number): Promise<Product> {
   const r = await fetch(`${API_BASE}?path=product&id=${id}`, {
     cache: "no-store",
   });
   if (!r.ok) throw new Error("Không tìm thấy sản phẩm");
-  const data = (await r.json()) as Product;
-  return data;
+  return r.json() as Promise<Product>;
 }
-
-// --- Categories + search: dùng luôn API_BASE cho đẹp ---
 
 export async function fetchCategories() {
   const r = await fetch(`${API_BASE}?path=categories`, {
     cache: "no-store",
   });
   if (!r.ok) throw new Error("Lỗi tải danh mục");
-
   const data = await r.json();
   return Array.isArray((data as any)?.items)
     ? (data as any).items
@@ -94,7 +84,6 @@ export async function searchProducts(q: string) {
     { cache: "no-store" }
   );
   if (!r.ok) throw new Error("Lỗi tìm kiếm");
-
   const data = await r.json();
   return Array.isArray((data as any)?.items)
     ? (data as any).items
