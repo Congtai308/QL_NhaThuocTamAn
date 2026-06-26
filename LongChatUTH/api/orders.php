@@ -16,7 +16,7 @@ $method = $_SERVER["REQUEST_METHOD"];
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // Kết nối DB
-$db = new mysqli("sql204.infinityfree.com", "if0_42200791", "Nctai656", "if0_42200791_nhathuoctaman", 3306);
+$db = new mysqli("nhathuoc-db.c76w068ecjiw.ap-southeast-2.rds.amazonaws.com", "admin", "hahaha113", "nhathuoctaman", 3306);
 if ($db->connect_errno) {
   echo json_encode(["success" => false, "error" => "Kết nối DB thất bại", "message" => $db->connect_error]);
   exit;

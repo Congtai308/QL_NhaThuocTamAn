@@ -30,7 +30,7 @@ $success = false;
 
 if ($secureHash === $vnp_SecureHash && $vnp_ResponseCode === "00") {
   // ✅ Thanh toán OK → cập nhật đơn
-  $db = new mysqli("sql204.infinityfree.com", "if0_42200791_nhathuoctaman", "Nctai656", "if0_42200791_nhathuoctaman", 3306);
+  $db = new mysqli("nhathuoc-db.c76w068ecjiw.ap-southeast-2.rds.amazonaws.com", "admin", "Nctai656", "nhathuoctaman", 3306);
   if (!$db->connect_error) {
     $db->set_charset("utf8mb4");
     $stmt = $db->prepare("UPDATE orders SET status = 'Paid' WHERE order_code = ?");

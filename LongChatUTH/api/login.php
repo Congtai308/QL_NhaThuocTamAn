@@ -12,10 +12,10 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 }
 
 // ===== Cấu hình kết nối MySQL =====
-$servername = "sql204.infinityfree.com";
-$username = "if0_42200791";
-$password = "Nctai656";
-$dbname = "if0_42200791_nhathuoctaman";
+$servername = "nhathuoc-db.c76w068ecjiw.ap-southeast-2.rds.amazonaws.com";
+$username = "admin";
+$password = "hahaha113";
+$dbname = "nhathuoctaman";
 $port = "3306";
 
 // Ẩn toàn bộ warning PHP (tránh phá JSON)

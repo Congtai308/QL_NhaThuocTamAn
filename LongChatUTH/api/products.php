@@ -22,10 +22,10 @@ $method = $_SERVER["REQUEST_METHOD"];
 
 try {
   $db = new mysqli(
-    "sql204.infinityfree.com",
-    "if0_42200791",
-    "Nctai656",
-    "if0_42200791_nhathuoctaman",
+    "nhathuoc-db.c76w068ecjiw.ap-southeast-2.rds.amazonaws.com",
+    "admin",
+    "hahaha113",
+    "nhathuoctaman",
     3306
   );
   $db->set_charset("utf8mb4");
