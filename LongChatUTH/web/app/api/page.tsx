@@ -23,7 +23,7 @@ type OrderForm = {
 };
 
 const ORDER_API =
-  "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
+  "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com/QL_NhaThuocTamAn/LongChatUTH/api/orders.php";
 
 const emptyForm: OrderForm = {
   order_code: "",

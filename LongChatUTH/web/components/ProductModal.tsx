@@ -49,8 +49,8 @@ export default function ProductModal({
       if (form.image instanceof File) formData.append("image", form.image);
 
       const url = editing
-        ? `http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/products.php?id=${editing.id}`
-        : "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/products.php";
+        ? `http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com/QL_NhaThuocTamAn/LongChatUTH/api/products.php?id=${editing.id}`
+        : "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com/QL_NhaThuocTamAn/LongChatUTH/api/products.php";
 
       await fetch(url, { method: "POST", body: formData });
       toast.success(

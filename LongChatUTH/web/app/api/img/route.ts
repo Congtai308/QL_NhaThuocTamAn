@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     // Nếu còn localhost thì map sang domain thật
     // ví dụ: http://localhost:9000/QL_NhaThuocTamAn/LongChatUTH/...
     if (raw.includes("localhost:9000")) {
-      raw = raw.replace("http://localhost:9000", "http://nhathuoctaman.freedev.app");
+      raw = raw.replace("http://localhost:9000", "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com");
     }
 
     const u = new URL(raw);
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Nếu là domain của bạn mà đang https lỗi, ép về http để bypass SSL
-    if (u.hostname === "nhathuoctaman.freedev.app" && u.protocol === "https:") {
+    if (u.hostname === "pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com" && u.protocol === "https:") {
       u.protocol = "http:";
     }
 

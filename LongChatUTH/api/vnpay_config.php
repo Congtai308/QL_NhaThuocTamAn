@@ -12,5 +12,5 @@ define("VNP_URL", "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html");
 // nhớ đổi domain khi lên thật
 define(
   "VNP_RETURNURL",
-  "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/vnpay_return.php"
+  "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com/QL_NhaThuocTamAn/LongChatUTH/api/vnpay_return.php"
 );

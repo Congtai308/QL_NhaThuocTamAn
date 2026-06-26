@@ -4,12 +4,12 @@
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
   (typeof window === "undefined"
-    ? "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api/index.php"
+    ? "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com/QL_NhaThuocTamAn/LongChatUTH/api/index.php"
     : "/api/php");
 
 export const IMAGE_BASE =
   process.env.NEXT_PUBLIC_IMAGE_BASE ||
-  "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/";
+  "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com/QL_NhaThuocTamAn/LongChatUTH/";
 
 export function imageUrl(src?: string | null) {
   if (!src) return "";

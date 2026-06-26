@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_BASE =
   process.env.BACKEND_BASE ||
-  "https://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api";
+  "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com/QL_NhaThuocTamAn/LongChatUTH/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,8 +21,8 @@ async function handleProxy(req: NextRequest) {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
         "Accept": "application/json, text/plain, */*",
         "Accept-Language": "vi-VN,vi;q=0.9",
-        "Referer": "https://nhathuoctaman.freedev.app/",
-        "Origin": "https://nhathuoctaman.freedev.app",
+        "Referer": "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com/",
+        "Origin": "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com",
       },
     };
 

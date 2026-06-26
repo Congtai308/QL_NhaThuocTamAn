@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_BASE =
-  "http://nhathuoctaman.freedev.app/QL_NhaThuocTamAn/LongChatUTH/api";
+  "http://pharmacy-alb-235357366.ap-southeast-2.elb.amazonaws.com/QL_NhaThuocTamAn/LongChatUTH/api";
 
 export async function GET(req: NextRequest) {
   // Lấy query string ?path=products&page=1&limit=8
